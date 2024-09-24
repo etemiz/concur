@@ -1,101 +1,190 @@
-import Image from "next/image";
+"use client";
+import { useEffect, useState } from "react";
+import { bytesToHex, randomBytes, hexToBytes } from "@noble/hashes/utils";
+import { secp256k1 } from "@noble/curves/secp256k1";
+import { cbc } from "@noble/ciphers/aes";
+import { base64 } from "@scure/base";
+import { bech32 } from "bech32";
+import {
+  generateSecretKey,
+  getPublicKey,
+  finalizeEvent,
+  verifyEvent,
+} from "nostr-tools/pure";
+import { Relay } from "nostr-tools/relay";
+
+const utf8Decoder = new TextDecoder("utf-8");
+const utf8Encoder = new TextEncoder();
+
+function convertNostrPublicKeyToHex(npub) {
+  const { words } = bech32.decode(npub);
+  const bytes = bech32.fromWords(words);
+  const hex = Buffer.from(bytes).toString("hex");
+
+  return hex;
+}
+
+let pk_other =
+  "npub1chadadwep45t4l7xx9z45p72xsxv7833zyy4tctdgh44lpc50nvsrjex2m";
+// pk_other = "622f2238d33cf54d8c6181a3475e69e9556df60bb57cbf157fd1ea06eeda41de";
+pk_other = convertNostrPublicKeyToHex(pk_other);
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [secretKeyMyself, setSecretKeyMyself] = useState(null);
+  const [publicKeyMyself, setPublicKeyMyself] = useState(null);
+  const [message, setMessage] = useState("");
+  const [relay, setRelay] = useState(null);
+  const [messageHistory, setMessageHistory] = useState({});
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+  const saveKeysToLocalStorage = (secretKey, publicKey) => {
+    localStorage.setItem("secretKeyMyself", secretKey);
+    localStorage.setItem("publicKeyMyself", publicKey);
+  }
+
+  const getKeysFromLocalStorage = () => {
+    let secretKey = localStorage.getItem("secretKeyMyself");
+    const publicKey = localStorage.getItem("publicKeyMyself");
+
+    return [secretKey, publicKey];
+  }
+
+  useEffect(() => {
+    let secretKey, publicKey;
+    [secretKey, publicKey] = getKeysFromLocalStorage();
+
+    if (secretKey && publicKey) {
+      setSecretKeyMyself(secretKey);
+      setPublicKeyMyself(publicKey);
+    } else {
+      secretKey = generateSecretKey();
+      secretKey = bytesToHex(secretKey);
+      publicKey = getPublicKey(secretKey);
+
+      setSecretKeyMyself(secretKey);
+      setPublicKeyMyself(publicKey);
+      saveKeysToLocalStorage(secretKey, publicKey)
+    }
+
+    (async () => {
+      const res = await Relay.connect("wss://nostr.mom");
+      setRelay(res);
+
+      res.subscribe([
+        {
+          kinds: [4],
+          authors: [pk_other],
+        },
+      ], {
+        async onevent(event) {
+          if (event.pubkey === pk_other && event.tags[0][1] === publicKey) {
+            const text = await decrypt(secretKey, pk_other, event.content);
+            setMessageHistory(prev => ({
+              ...prev,
+              [event.id]: { text: text, isUser: false }
+            }));
+          }
+        }
+      })
+    })();
+
+    return () => { relay?.close() }
+  }, []);
+
+  const sendMessage = async () => {
+    let eventTemplate = {
+      pubkey: publicKeyMyself,
+      created_at: Math.floor(Date.now() / 1000),
+      kind: 4,
+      tags: [["p", pk_other]],
+      content: await encrypt(secretKeyMyself, pk_other, message),
+    };
+
+
+    const signedEvent = finalizeEvent(eventTemplate, hexToBytes(secretKeyMyself));
+
+    const res = await relay.publish(signedEvent);
+
+    setMessageHistory(prev => ({
+      ...prev,
+      [signedEvent.id]: { text: message, isUser: true }
+    }));
+    setMessage("");
+  };
+
+  async function encrypt(secretKey, pubkey, text) {
+    const privkey =
+      secretKey instanceof Uint8Array ? bytesToHex(secretKey) : secretKey;
+    const key = secp256k1.getSharedSecret(privkey, "02" + pubkey);
+    const normalizedKey = getNormalizedX(key);
+
+    let iv = Uint8Array.from(randomBytes(16));
+    let plaintext = utf8Encoder.encode(text);
+
+    let ciphertext = cbc(normalizedKey, iv).encrypt(plaintext);
+
+    let ctb64 = base64.encode(new Uint8Array(ciphertext));
+    let ivb64 = base64.encode(new Uint8Array(iv.buffer));
+
+    return `${ctb64}?iv=${ivb64}`;
+  }
+
+  async function decrypt(secretKey, pubkey, data) {
+    const privkey =
+      secretKey instanceof Uint8Array ? bytesToHex(secretKey) : secretKey;
+    let [ctb64, ivb64] = data.split("?iv=");
+    let key = secp256k1.getSharedSecret(privkey, "02" + pubkey);
+    let normalizedKey = getNormalizedX(key);
+
+    let iv = base64.decode(ivb64);
+    let ciphertext = base64.decode(ctb64);
+
+    let plaintext = cbc(normalizedKey, iv).decrypt(ciphertext);
+
+    return utf8Decoder.decode(plaintext);
+  }
+
+  function getNormalizedX(key) {
+    return key.slice(1, 33);
+  }
+
+  return (
+    <div className="h-[100vh] max-h-[100vh] flex flex-col justify-between">
+      <div className="text-3xl text-center font-bold my-4">CONCUR</div>
+      <div className="flex-grow justify-end text-black p-4 overflow-y-auto">
+        {Object.keys(messageHistory).map((eventId) => {
+          const message = messageHistory[eventId];
+          return (
+            <div
+              key={eventId}
+              className={`flex flex-col my-2 ${
+                message.isUser ? "items-end" : "items-start"
+              }`}
+            >
+              <div
+                className={`p-3 rounded-3xl text-black ${
+                  message.isUser ? "bg-green-300" : "bg-blue-300"
+                }`}
+              >
+                {message.text}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex">
+        <input
+          className="my-4 ml-4 rounded-3xl py-3 pl-3 text-black w-full"
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        />
+        <button
+          onClick={sendMessage}
+          className="m-4 rounded p-3 bg-green-500 text-black"
         >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          SEND
+        </button>
+      </div>
     </div>
   );
 }
