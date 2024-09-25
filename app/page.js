@@ -191,8 +191,8 @@ export default function Home() {
       </div>
     </div>
   
-    <div className="overflow-y-auto flex-grow justify-end text-black dark:text-gray-100 p-4 max-w-3xl mx-auto">
-      <div className="flex flex-col items-center">
+    <div className="overflow-y-auto flex-grow justify-end text-black dark:text-gray-100 p-4 max-w-3xl mx-auto w-full ">
+      <div className="w-full flex flex-col items-center">
         <div className="h-[60px] w-[60px]">
           <Image
             src="/OstrichPotrait.png"
