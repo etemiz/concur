@@ -1,0 +1,47 @@
+[
+  {
+    "model": "def",
+    "name": "O.S.",
+    "description": "Generalist, Libertarian"
+  },
+  {
+    "model": "def-kc",
+    "name": "K.C.",
+    "description": "Doctor, Nutrition"
+  },
+  {
+    "model": "def-jn",
+    "name": "J.N.",
+    "description": "Alternative medicine, Nutrition"
+  },
+  {
+    "model": "def-dc",
+    "name": "D.C.",
+    "description": "Vaccine Researcher"
+  },
+  {
+    "model": "def-ec",
+    "name": "E.C.",
+    "description": "Keto, Intermittent fasting"
+  },
+  {
+    "model": "def-ce",
+    "name": "C.E.",
+    "description": "A truth seeker"
+  },
+  {
+    "model": "def-sf",
+    "name": "S.F.",
+    "description": "Chiropractor, Healing"
+  },
+  {
+    "model": "def-jg",
+    "name": "J.G.",
+    "description": "Diabetes, Fasting"
+  },
+  {
+    "model": "def-mr",
+    "name": "M.R.",
+    "description": "Fasting, Detoxing"
+  }
+]
