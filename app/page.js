@@ -38,13 +38,14 @@ export default function Home() {
   const [publicKeyMyself, setPublicKeyMyself] = useState(null);
   const [message, setMessage] = useState("");
   const [relay, setRelay] = useState(null);
-  const [messageHistory, setMessageHistory] = useState({});
+  const [messageHistory, setMessageHistory] = useState([]);
   const [isSelectModelDialogOpen, setIsSelectModelDialogOpen] = useState(false);
   const [selectedAIModel, setSelectedAIModel] = useState({
     model: "def",
     name: "O.S.",
     description: "Generalist, Libertarian",
   });
+  const [testState, setTestState] = useState(false);
 
   const saveKeysToLocalStorage = (secretKey, publicKey) => {
     localStorage.setItem("secretKeyMyself", secretKey);
@@ -79,6 +80,9 @@ export default function Home() {
       const res = await Relay.connect("wss://nostr.mom");
       setRelay(res);
 
+      let someArr = [];
+      let end = false;
+
       res.subscribe(
         [
           {
@@ -89,19 +93,35 @@ export default function Home() {
         {
           async onevent(event) {
             if (event.pubkey === pk_other && event.tags[0][1] === publicKey) {
-              const text = await decrypt(secretKey, pk_other, event.content);
-              setMessageHistory((prev) => ({
-                ...prev,
-                [event.id]: { text: text, isUser: false },
-              }));
+              const newMessageText = await decrypt(secretKey, pk_other, event.content);
+
+              someArr.push({ ...event, text: newMessageText, isUser: false });
+
+              if(end){
+                setMessageHistory(someArr);
+                setTestState(prev => !prev);
+
+              }
             }
-            if (event.pubkey === publicKey && event.tags[0][1] === pk_other) {
-              const text = await decrypt(secretKey, pk_other, event.content);
-              setMessageHistory((prev) => ({
-                ...prev,
-                [event.id]: { text: text, isUser: true },
-              }));
+            if (
+              event.pubkey === publicKey &&
+              event.tags[0][1] === pk_other
+              
+            ) {
+              const newMessageText = await decrypt(secretKey, pk_other, event.content);
+              someArr.push({ ...event, text: newMessageText, isUser: true });
+              setMessageHistory(someArr);
+              setTestState(prev => !prev);
             }
+          },
+          async oneose() {
+            someArr = sortByCreatedAt(someArr);
+
+            setMessageHistory(
+              someArr
+            );
+            setTestState(prev => !prev);
+            end= true
           },
         }
       );
@@ -111,6 +131,17 @@ export default function Home() {
       relay?.close();
     };
   }, []);
+
+  useEffect(() => {
+  }, [testState])
+
+  function sortByCreatedAt(arr) {
+    if (arr.length === 0) {
+      return [];
+    }
+
+    return arr.sort((a, b) => a.created_at - b.created_at);
+  }
 
   const sendMessage = async () => {
     let eventTemplate = {
@@ -128,10 +159,6 @@ export default function Home() {
 
     const res = await relay.publish(signedEvent);
 
-    setMessageHistory((prev) => ({
-      ...prev,
-      [signedEvent.id]: { text: message, isUser: true },
-    }));
     setMessage("");
   };
 
@@ -178,6 +205,9 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+  }, [messageHistory.length]);
+
   return (
     <div className="font-roboto h-[100vh] max-h-[100vh] flex flex-col justify-between bg-white dark:bg-gray-900">
       <div className="py-4 flex items-center">
@@ -186,16 +216,24 @@ export default function Home() {
           onClick={() => setIsSelectModelDialogOpen(true)}
         >
           <svg
-            className="h-6 text-black dark:text-white"
-            viewBox="0 0 24 24"
-            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            version="1.0"
+            width="30.000000pt"
+            height="30.000000pt"
+            viewBox="0 0 500.000000 500.000000"
+            preserveAspectRatio="xMidYMid meet"
+            className="text-black dark:text-white"
           >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M5.29289 9.29289C5.68342 8.90237 6.31658 8.90237 6.70711 9.29289L12 14.5858L17.2929 9.29289C17.6834 8.90237 18.3166 8.90237 18.7071 9.29289C19.0976 9.68342 19.0976 10.3166 18.7071 10.7071L12.7071 16.7071C12.5196 16.8946 12.2652 17 12 17C11.7348 17 11.4804 16.8946 11.2929 16.7071L5.29289 10.7071C4.90237 10.3166 4.90237 9.68342 5.29289 9.29289Z"
+            <g
+              transform="translate(0.000000,500.000000) scale(0.100000,-0.100000)"
               fill="currentColor"
-            ></path>
+              stroke="none"
+            >
+              <path d="M3782 4819 c-267 -32 -476 -133 -663 -319 -143 -143 -233 -298 -286 -495 -30 -109 -42 -335 -24 -439 42 -241 142 -436 311 -607 249 -252 605 -364 961 -303 448 77 812 444 885 894 73 449 -128 884 -521 1122 -182 111 -459 172 -663 147z m218 -109 c327 -37 620 -243 770 -540 187 -371 114 -834 -177 -1125 -24 -25 -49 -45 -54 -45 -5 0 -9 18 -9 39 0 21 -10 70 -21 107 -56 182 -160 310 -321 394 l-68 36 41 33 c94 76 144 199 137 341 -3 73 -9 98 -36 152 -42 87 -110 152 -202 197 -70 33 -81 36 -170 36 -87 -1 -101 -4 -167 -34 -171 -80 -278 -274 -243 -444 18 -86 73 -190 128 -238 25 -21 43 -41 41 -43 -2 -1 -33 -18 -69 -37 -85 -44 -205 -163 -253 -249 -43 -78 -62 -133 -77 -222 -7 -38 -15 -68 -18 -68 -10 0 -104 105 -148 166 -62 87 -120 214 -150 329 -37 143 -37 327 0 470 114 438 491 740 941 754 22 0 78 -4 125 -9z" />
+              <path d="M1700 4242 c-30 -10 -39 -37 -40 -113 l0 -75 -128 -12 c-326 -31 -600 -160 -832 -392 -110 -109 -179 -202 -247 -330 -83 -157 -141 -365 -150 -541 -6 -106 -6 -107 20 -124 15 -9 34 -14 45 -11 11 4 41 44 67 89 166 286 436 506 747 608 117 38 296 69 399 69 l79 0 0 -80 c0 -67 3 -83 20 -100 36 -36 -3 -58 420 245 161 116 299 219 306 230 20 30 8 56 -44 93 -26 18 -150 107 -277 197 -126 90 -255 181 -285 203 -62 44 -79 51 -100 44z" />
+              <path d="M928 2345 c-397 -67 -735 -361 -856 -745 -154 -488 44 -1009 483 -1272 376 -225 852 -200 1211 65 196 145 344 368 405 615 25 100 29 136 29 254 0 193 -31 333 -111 492 -214 430 -688 671 -1161 591z m423 -124 c376 -98 648 -388 730 -776 7 -33 13 -118 13 -190 -1 -109 -5 -146 -28 -230 -45 -169 -120 -304 -236 -429 -67 -71 -80 -72 -80 -9 0 48 -42 173 -84 246 -19 36 -65 93 -101 128 -63 62 -175 139 -202 139 -22 0 -15 11 41 70 113 119 151 259 106 401 -32 104 -82 173 -168 232 -167 115 -421 80 -544 -76 -50 -62 -65 -88 -82 -147 -45 -152 4 -326 122 -432 l41 -37 -43 -20 c-195 -86 -340 -288 -371 -515 l-7 -48 -35 33 c-19 19 -62 69 -94 113 -136 180 -199 368 -199 595 1 356 181 667 495 853 99 58 197 92 355 122 60 11 297 -3 371 -23z" />
+              <path d="M4602 2323 c-10 -16 -31 -50 -47 -78 -78 -139 -265 -336 -405 -428 -218 -142 -482 -227 -711 -227 l-99 0 0 78 c0 64 -4 82 -18 95 -23 21 -60 22 -81 3 -9 -7 -41 -31 -72 -52 -229 -159 -572 -410 -580 -425 -15 -30 6 -63 68 -104 32 -22 143 -101 246 -175 104 -74 198 -142 210 -150 13 -8 52 -36 89 -63 72 -51 83 -55 116 -31 20 14 22 24 22 100 l0 84 68 0 c95 0 235 25 350 61 490 157 838 562 926 1078 9 52 16 127 16 167 0 62 -3 75 -19 84 -33 17 -59 11 -79 -17z" />
+            </g>
           </svg>
         </div>
 
@@ -245,11 +283,10 @@ export default function Home() {
             </div>
           </div>
 
-          {Object.keys(messageHistory).map((eventId) => {
-            const message = messageHistory[eventId];
+          {messageHistory.map((message) => {
             return (
               <Message
-                key={eventId}
+                key={message.id}
                 message={message.text}
                 isUser={message.isUser}
                 imageSource={message.isUser ? "/Y.png" : "/BotPic.png"}

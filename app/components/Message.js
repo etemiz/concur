@@ -7,7 +7,7 @@ const Message = ({ message, isUser, imageSource, name }) => {
     return (
       <div className="flex flex-row-reverse my-2">
         <div className="w-[20px] h-[20px] min-w-[30px]">
-          <Image className="rounded-full" height={20} width={20} src={imageSource} />
+          <Image className="rounded-full" height={20} width={20} src={imageSource} alt={"Your Picture"} />
         </div>
         <div className="flex flex-col items-end justify-between">
           <div className="font-light text-sm px-2 text-gray-600 dark:text-gray-300">{name}</div>
@@ -21,7 +21,7 @@ const Message = ({ message, isUser, imageSource, name }) => {
     return (
       <div className="flex my-2">
         <div className="w-[20px] h-[20px] min-w-[20px]">
-          <Image className="rounded-full w-[20px] h-[20px]" style={{ width: "20px !important", height: "20px !important" }} height={20} width={20} src={imageSource} />
+          <Image className="rounded-full w-[20px] h-[20px]" style={{ width: "20px !important", height: "20px !important" }} height={20} width={20} src={imageSource} alt={"Bot Picture"} />
         </div>
         <div className="flex flex-col justify-between">
           <div className="font-light text-sm px-2 text-gray-600 dark:text-gray-300">{name}</div>
