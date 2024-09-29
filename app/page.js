@@ -1,32 +1,24 @@
 "use client";
 import { useEffect, useState } from "react";
 import { bytesToHex, randomBytes, hexToBytes } from "@noble/hashes/utils";
-import { secp256k1 } from "@noble/curves/secp256k1";
-import { cbc } from "@noble/ciphers/aes";
-import { base64 } from "@scure/base";
 import { bech32 } from "bech32";
 import {
   generateSecretKey,
   getPublicKey,
   finalizeEvent,
-  verifyEvent,
 } from "nostr-tools/pure";
 import { Relay } from "nostr-tools/relay";
 import Image from "next/image";
 import Message from "./components/Message";
 import TextareaAutosize from "react-textarea-autosize";
 import SelectModelDialog from "./components/SelectModelDialog";
-
-const utf8Decoder = new TextDecoder("utf-8");
-const utf8Encoder = new TextEncoder();
-
-function convertNostrPublicKeyToHex(npub) {
-  const { words } = bech32.decode(npub);
-  const bytes = bech32.fromWords(words);
-  const hex = Buffer.from(bytes).toString("hex");
-
-  return hex;
-}
+import { encrypt, decrypt } from "./helpers/nip4Helpers";
+import {
+  saveKeysToLocalStorage,
+  getKeysFromLocalStorage,
+} from "./helpers/localStorageHelper";
+import { convertNostrPublicKeyToHex } from "./helpers/nip4Helpers";
+import aiModelsData from "../ai-models.json";
 
 let pk_other =
   "npub1chadadwep45t4l7xx9z45p72xsxv7833zyy4tctdgh44lpc50nvsrjex2m";
@@ -40,24 +32,8 @@ export default function Home() {
   const [relay, setRelay] = useState(null);
   const [messageHistory, setMessageHistory] = useState([]);
   const [isSelectModelDialogOpen, setIsSelectModelDialogOpen] = useState(false);
-  const [selectedAIModel, setSelectedAIModel] = useState({
-    model: "def",
-    name: "O.S.",
-    description: "Generalist, Libertarian",
-  });
+  const [selectedAIModel, setSelectedAIModel] = useState(aiModelsData[0]);
   const [testState, setTestState] = useState(false);
-
-  const saveKeysToLocalStorage = (secretKey, publicKey) => {
-    localStorage.setItem("secretKeyMyself", secretKey);
-    localStorage.setItem("publicKeyMyself", publicKey);
-  };
-
-  const getKeysFromLocalStorage = () => {
-    let secretKey = localStorage.getItem("secretKeyMyself");
-    const publicKey = localStorage.getItem("publicKeyMyself");
-
-    return [secretKey, publicKey];
-  };
 
   useEffect(() => {
     let secretKey, publicKey;
@@ -93,35 +69,48 @@ export default function Home() {
         {
           async onevent(event) {
             if (event.pubkey === pk_other && event.tags[0][1] === publicKey) {
-              const newMessageText = await decrypt(secretKey, pk_other, event.content);
+              const newMessageText = await decrypt(
+                secretKey,
+                pk_other,
+                event.content
+              );
 
               someArr.push({ ...event, text: newMessageText, isUser: false });
 
-              if(end){
-                setMessageHistory(someArr);
-                setTestState(prev => !prev);
+              if (end) {
+                setMessageHistory((prev) => [
+                  ...prev,
+                  { ...event, text: newMessageText, isUser: false },
+                ]);
 
+                setTestState((prev) => !prev);
               }
             }
-            if (
-              event.pubkey === publicKey &&
-              event.tags[0][1] === pk_other
-              
-            ) {
-              const newMessageText = await decrypt(secretKey, pk_other, event.content);
+            if (event.pubkey === publicKey && event.tags[0][1] === pk_other) {
+              const newMessageText = await decrypt(
+                secretKey,
+                pk_other,
+                event.content
+              );
               someArr.push({ ...event, text: newMessageText, isUser: true });
-              setMessageHistory(someArr);
-              setTestState(prev => !prev);
+
+              if (end) {
+                setMessageHistory((prev) => [
+                  ...prev,
+                  { ...event, text: newMessageText, isUser: true },
+                ]);
+                setTestState((prev) => !prev);
+              }
             }
           },
           async oneose() {
             someArr = sortByCreatedAt(someArr);
 
-            setMessageHistory(
-              someArr
-            );
-            setTestState(prev => !prev);
-            end= true
+            setMessageHistory([...someArr, selectedAIModelStatusMessage()]);
+            someArr.push(selectedAIModelStatusMessage());
+
+            setTestState((prev) => !prev);
+            end = true;
           },
         }
       );
@@ -132,25 +121,17 @@ export default function Home() {
     };
   }, []);
 
-  useEffect(() => {
-  }, [testState])
-
-  function sortByCreatedAt(arr) {
-    if (arr.length === 0) {
-      return [];
-    }
-
-    return arr.sort((a, b) => a.created_at - b.created_at);
-  }
-
   const sendMessage = async () => {
     let eventTemplate = {
       pubkey: publicKeyMyself,
       created_at: Math.floor(Date.now() / 1000),
       kind: 4,
-      tags: [["p", pk_other]],
+      tags: [],
       content: await encrypt(secretKeyMyself, pk_other, message),
     };
+
+    eventTemplate = addTag(eventTemplate, "p", pk_other);
+    eventTemplate = addTag(eventTemplate, "model", selectedAIModel?.model);
 
     const signedEvent = finalizeEvent(
       eventTemplate,
@@ -162,42 +143,6 @@ export default function Home() {
     setMessage("");
   };
 
-  async function encrypt(secretKey, pubkey, text) {
-    const privkey =
-      secretKey instanceof Uint8Array ? bytesToHex(secretKey) : secretKey;
-    const key = secp256k1.getSharedSecret(privkey, "02" + pubkey);
-    const normalizedKey = getNormalizedX(key);
-
-    let iv = Uint8Array.from(randomBytes(16));
-    let plaintext = utf8Encoder.encode(text);
-
-    let ciphertext = cbc(normalizedKey, iv).encrypt(plaintext);
-
-    let ctb64 = base64.encode(new Uint8Array(ciphertext));
-    let ivb64 = base64.encode(new Uint8Array(iv.buffer));
-
-    return `${ctb64}?iv=${ivb64}`;
-  }
-
-  async function decrypt(secretKey, pubkey, data) {
-    const privkey =
-      secretKey instanceof Uint8Array ? bytesToHex(secretKey) : secretKey;
-    let [ctb64, ivb64] = data.split("?iv=");
-    let key = secp256k1.getSharedSecret(privkey, "02" + pubkey);
-    let normalizedKey = getNormalizedX(key);
-
-    let iv = base64.decode(ivb64);
-    let ciphertext = base64.decode(ctb64);
-
-    let plaintext = cbc(normalizedKey, iv).decrypt(ciphertext);
-
-    return utf8Decoder.decode(plaintext);
-  }
-
-  function getNormalizedX(key) {
-    return key.slice(1, 33);
-  }
-
   const handleKeyDown = (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
       sendMessage();
@@ -205,8 +150,40 @@ export default function Home() {
     }
   };
 
+  const addTag = (event, tagKey, tagValue) => {
+    return {
+      ...event,
+      tags: [...event.tags, [tagKey, tagValue]],
+    };
+  };
+
+  useEffect(() => {}, [testState]);
+
+  useEffect(() => {}, [messageHistory.length]);
+
+  function sortByCreatedAt(arr) {
+    if (arr.length === 0) {
+      return [];
+    }
+
+    return arr.sort((a, b) => a.created_at - b.created_at);
+  }
+
   useEffect(() => {
-  }, [messageHistory.length]);
+    setMessageHistory([...messageHistory, selectedAIModelStatusMessage()]);
+  }, [selectedAIModel]);
+
+  useEffect(() => {}, [messageHistory.length]);
+
+  useEffect(() => {}, [messageHistory.length]);
+
+  const selectedAIModelStatusMessage = () => {
+    return {
+      id: "status-message",
+      name: selectedAIModel?.name,
+      description: selectedAIModel?.description,
+    };
+  };
 
   return (
     <div className="font-roboto h-[100vh] max-h-[100vh] flex flex-col justify-between bg-white dark:bg-gray-900">
@@ -218,8 +195,8 @@ export default function Home() {
           <svg
             xmlns="http://www.w3.org/2000/svg"
             version="1.0"
-            width="30.000000pt"
-            height="30.000000pt"
+            width="20.000000pt"
+            height="20.000000pt"
             viewBox="0 0 500.000000 500.000000"
             preserveAspectRatio="xMidYMid meet"
             className="text-black dark:text-white"
@@ -262,36 +239,9 @@ export default function Home() {
 
       <div className="overflow-y-auto flex-grow justify-end w-full">
         <div className="overflow-y-auto flex-grow justify-end text-black dark:text-gray-100 p-4 max-w-3xl mx-auto w-full">
-          <div className="w-full flex flex-col items-center">
-            <div className="h-[60px] w-[60px]">
-              <Image
-                src="/BotPic.png"
-                width={60}
-                height={60}
-                alt="Potrait of an Ostrich"
-                style={{ borderRadius: "50%" }}
-              />
-            </div>
-
-            <div className="flex flex-col items-center ml-4">
-              <div className="text-md py-1 text-center font-semi-bold line-clamp-1 text-ellipsis break-anywhere overflow-hidden whitespace-normal font-roboto dark:text-gray-200">
-                {selectedAIModel.name} {selectedAIModel.description}
-              </div>
-              <div className="text-[13px] text-[#6b6b6b] dark:text-gray-400 py-1">
-                By @Conscious Curations
-              </div>
-            </div>
-          </div>
-
           {messageHistory.map((message) => {
             return (
-              <Message
-                key={message.id}
-                message={message.text}
-                isUser={message.isUser}
-                imageSource={message.isUser ? "/Y.png" : "/BotPic.png"}
-                name={message.isUser ? "You" : selectedAIModel.name}
-              />
+              <Message key={message.id + Math.random()} message={message} />
             );
           })}
           <div className="h-[100px] bg-transparent"></div>
