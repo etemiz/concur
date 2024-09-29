@@ -19,6 +19,7 @@ import {
 } from "./helpers/localStorageHelper";
 import { convertNostrPublicKeyToHex } from "./helpers/nip4Helpers";
 import aiModelsData from "../ai-models.json";
+import BrainSvg from "./svgs/BrainSvg";
 
 let pk_other =
   "npub1chadadwep45t4l7xx9z45p72xsxv7833zyy4tctdgh44lpc50nvsrjex2m";
@@ -34,6 +35,7 @@ export default function Home() {
   const [isSelectModelDialogOpen, setIsSelectModelDialogOpen] = useState(false);
   const [selectedAIModel, setSelectedAIModel] = useState(aiModelsData[0]);
   const [testState, setTestState] = useState(false);
+  const [numberOfHeaderBrainIcons, setNumberOfHeaderBrainIcons] = useState(0);
 
   useEffect(() => {
     let secretKey, publicKey;
@@ -140,7 +142,22 @@ export default function Home() {
 
     const res = await relay.publish(signedEvent);
 
+    incrementBainIconInHeaderIfLearningRequested(message);
     setMessage("");
+  };
+
+  const incrementBainIconInHeaderIfLearningRequested = (message) => {
+    const pattern = /learn this:/i;
+
+    if (pattern.test(message)) {
+      setNumberOfHeaderBrainIcons((prev) => {
+        if (prev === 3) {
+          return prev;
+        }
+
+        return prev + 1;
+      });
+    }
   };
 
   const handleKeyDown = (event) => {
@@ -230,11 +247,27 @@ export default function Home() {
               {selectedAIModel.name} {selectedAIModel.description}
             </div>
             <div className="text-[13px] text-[#6b6b6b] dark:text-gray-400">
-              By @Conscious Curations
+              Contact:{" "}
+              <a
+                className="decoration-solid underline"
+                href="mailto:et@concur.guru"
+              >
+                et@concur.guru
+              </a>
             </div>
           </div>
-          <div className="px-2"></div>
         </div>
+
+        {numberOfHeaderBrainIcons > 0 && (
+          <div className="flex pr-4 pl-1 items-center">
+            <p className="px-1">+</p>
+            {Array.from({ length: numberOfHeaderBrainIcons }).map(
+              (_, index) => (
+                <BrainSvg key={index} />
+              )
+            )}
+          </div>
+        )}
       </div>
 
       <div className="overflow-y-auto flex-grow justify-end w-full">

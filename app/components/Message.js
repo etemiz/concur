@@ -104,9 +104,12 @@ const StatusMessage = ({ message }) => {
         <div className="text-md py-1 text-center font-semi-bold line-clamp-1 text-ellipsis break-anywhere overflow-hidden whitespace-normal font-roboto dark:text-gray-200">
           {message.name} {message.description}
         </div>
-        <div className="text-[13px] text-[#6b6b6b] dark:text-gray-400 py-1">
-          By @Conscious Curations
-        </div>
+        <a
+          className="text-[13px] text-[#6b6b6b] dark:text-gray-400 py-1 underline decoration-solid"
+          href="mailto:et@concur.guru"
+        >
+          et@concur.guru
+        </a>
       </div>
     </div>
   );
