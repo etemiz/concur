@@ -7,7 +7,6 @@ import {
   getPublicKey,
   finalizeEvent,
 } from "nostr-tools/pure";
-import { Relay } from "nostr-tools/relay";
 import Image from "next/image";
 import Message from "./components/Message";
 import TextareaAutosize from "react-textarea-autosize";
@@ -21,6 +20,8 @@ import { convertNostrPublicKeyToHex } from "./helpers/nip4Helpers";
 import aiModelsData from "../ai-models.json";
 import BrainSvg from "./svgs/BrainSvg";
 import { usePathname } from "next/navigation";
+import { SimplePool } from "nostr-tools/pool";
+import settings from '../settings.json';
 
 let pk_other =
   "npub1chadadwep45t4l7xx9z45p72xsxv7833zyy4tctdgh44lpc50nvsrjex2m";
@@ -28,6 +29,9 @@ let pk_other =
 pk_other = convertNostrPublicKeyToHex(pk_other);
 
 export default function MyLayout() {
+
+  const pool = new SimplePool();
+
   const selectedAIModelBasedOnPath = () => {
     let modelAccordingToPath = aiModelsData[0];
     aiModelsData.forEach((model) => {
@@ -38,10 +42,10 @@ export default function MyLayout() {
 
     return modelAccordingToPath;
   };
+
   const [secretKeyMyself, setSecretKeyMyself] = useState(null);
   const [publicKeyMyself, setPublicKeyMyself] = useState(null);
   const [message, setMessage] = useState("");
-  const [relay, setRelay] = useState(null);
   const [messageHistory, setMessageHistory] = useState([]);
   const [isSelectModelDialogOpen, setIsSelectModelDialogOpen] = useState(false);
   const pathname = usePathname();
@@ -50,6 +54,10 @@ export default function MyLayout() {
   );
   const [testState, setTestState] = useState(false);
   const [numberOfHeaderBrainIcons, setNumberOfHeaderBrainIcons] = useState(0);
+
+  const [relayPool, setRelayPool] = useState();
+  
+  const listOfRelays = settings.listOfRelays
 
   useEffect(() => {
     let secretKey, publicKey;
@@ -68,74 +76,76 @@ export default function MyLayout() {
       saveKeysToLocalStorage(secretKey, publicKey);
     }
 
-    (async () => {
-      const res = await Relay.connect("wss://nostr.mom");
-      setRelay(res);
-
-      let someArr = [];
-      let end = false;
-
-      res.subscribe(
-        [
-          {
-            kinds: [4],
-            authors: [pk_other, publicKey],
-          },
-        ],
-        {
-          async onevent(event) {
-            if (event.pubkey === pk_other && event.tags[0][1] === publicKey) {
-              const newMessageText = await decrypt(
-                secretKey,
-                pk_other,
-                event.content
-              );
-
-              someArr.push({ ...event, text: newMessageText, isUser: false });
-
-              if (end) {
-                setMessageHistory((prev) => [
-                  ...prev,
-                  { ...event, text: newMessageText, isUser: false },
-                ]);
-
-                setTestState((prev) => !prev);
-              }
-            }
-            if (event.pubkey === publicKey && event.tags[0][1] === pk_other) {
-              const newMessageText = await decrypt(
-                secretKey,
-                pk_other,
-                event.content
-              );
-              someArr.push({ ...event, text: newMessageText, isUser: true });
-
-              if (end) {
-                setMessageHistory((prev) => [
-                  ...prev,
-                  { ...event, text: newMessageText, isUser: true },
-                ]);
-                setTestState((prev) => !prev);
-              }
-            }
-          },
-          async oneose() {
-            someArr = sortByCreatedAt(someArr);
-
-            setMessageHistory([...someArr, selectedAIModelStatusMessage()]);
-            someArr.push(selectedAIModelStatusMessage());
-
-            setTestState((prev) => !prev);
-            end = true;
-          },
-        }
-      );
-    })();
-
-    return () => {
-      relay?.close();
-    };
+    subscribingToMultipleRelays(secretKey, publicKey);
   }, []);
+
+  const subscribingToMultipleRelays = async (secretKey,publicKey) => {
+    let someArr = [];
+    let end = false;
+
+    let h = pool.subscribeMany(
+      listOfRelays,
+      [
+        {
+          kinds: [4],
+          authors: [pk_other, publicKey],
+        },
+      ],
+      {
+        async onevent(event) {
+          if (event.pubkey === pk_other && event.tags[0][1] === publicKey) {
+            const newMessageText = await decrypt(
+              secretKey,
+              pk_other,
+              event.content
+            );
+
+            someArr.push({ ...event, text: newMessageText, isUser: false });
+
+            if (end) {
+              setMessageHistory((prev) => [
+                ...prev,
+                { ...event, text: newMessageText, isUser: false },
+              ]);
+
+              setTestState((prev) => !prev);
+            }
+          }
+          if (event.pubkey === publicKey && event.tags[0][1] === pk_other) {
+            const newMessageText = await decrypt(
+              secretKey,
+              pk_other,
+              event.content
+            );
+            someArr.push({ ...event, text: newMessageText, isUser: true });
+
+            if (end) {
+              setMessageHistory((prev) => [
+                ...prev,
+                { ...event, text: newMessageText, isUser: true },
+              ]);
+              setTestState((prev) => !prev);
+            }
+          }
+        },
+        async oneose() {
+          someArr = sortByCreatedAt(someArr);
+
+          setMessageHistory([...someArr, selectedAIModelStatusMessage()]);
+          someArr.push(selectedAIModelStatusMessage());
+
+          setTestState((prev) => !prev);
+          end = true;
+        },
+      }
+    );
+
+    setRelayPool(h);
+  };
+
+  useEffect(()=>{
+    return  () => relayPool?.close();
+  }, [])
 
   const sendMessage = async () => {
     let eventTemplate = {
@@ -154,11 +164,11 @@ export default function MyLayout() {
       hexToBytes(secretKeyMyself)
     );
 
-    const res = await relay.publish(signedEvent);
+    await Promise.any(pool.publish(listOfRelays, signedEvent))
 
     incrementBainIconInHeaderIfLearningRequested(message);
     setMessage("");
-  };
+  }
 
   const incrementBainIconInHeaderIfLearningRequested = (message) => {
     const pattern = /learn this:/i;
