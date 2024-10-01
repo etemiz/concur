@@ -39,6 +39,7 @@ export default function SelectModelDialog({
                   onClick={() => {
                     setIsSelectModelDialogOpen(false);
                     setSelectedAIModel(aiModel)
+                    window.history.pushState(null, '', aiModel.route);
                   }}
                 >
                   <div className="h-[35px] w-[35px]">

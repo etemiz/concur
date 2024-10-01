@@ -3,54 +3,63 @@
     "model": "def",
     "name": "O.S.",
     "description": "Generalist, Libertarian",
-    "bot": "1"
+    "bot": "1",
+    "route": "/os"
   },
   {
     "model": "def-kc",
     "name": "K.C.",
     "description": "Doctor, Nutrition",
-    "bot": "2"
+    "bot": "2",
+    "route": "/kc"
   },
   {
     "model": "def-jn",
     "name": "J.N.",
     "description": "Alternative medicine, Nutrition",
-    "bot": "3"
+    "bot": "3",
+    "route": "/jn"
   },
   {
     "model": "def-dc",
     "name": "D.C.",
     "description": "Vaccine Researcher",
-    "bot": "4"
+    "bot": "4",
+    "route": "/dc"
   },
   {
     "model": "def-ec",
     "name": "E.C.",
     "description": "Keto, Intermittent fasting",
-    "bot": "5"
+    "bot": "5",
+    "route": "/ec"
   },
   {
     "model": "def-ce",
     "name": "C.E.",
     "description": "A truth seeker",
-    "bot": "6"
+    "bot": "6",
+    "route": "/ce"
   },
   {
     "model": "def-sf",
     "name": "S.F.",
     "description": "Chiropractor, Healing",
-    "bot": "7"
+    "bot": "7",
+    "route": "/sf"
   },
   {
     "model": "def-jg",
     "name": "J.G.",
     "description": "Diabetes, Fasting",
-    "bot": "8"
+    "bot": "8",
+    "route": "/jg"
   },
   {
     "model": "def-mr",
     "name": "M.R.",
     "description": "Fasting, Detoxing",
-    "bot": "9"
+    "bot": "9",
+    "route": "/mr"
   }
 ]

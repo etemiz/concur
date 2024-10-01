@@ -1,6 +1,7 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import { Roboto } from 'next/font/google';
+import MyLayout from "./mylayout";
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -30,7 +31,9 @@ export default function RootLayout({ children }) {
       <body
         className={`${roboto.variable} ${geistSans.variable} ${geistMono.variable} antialiased bg-[#F4F4F5] dark:bg-[#18181B]`}
       >
-        {children}
+        <MyLayout>
+          {children}
+        </MyLayout>
       </body>
     </html>
   );
