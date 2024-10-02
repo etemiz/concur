@@ -1,8 +1,13 @@
 import { cbc } from "@noble/ciphers/aes";
 import { secp256k1 } from "@noble/curves/secp256k1";
 import { base64 } from "@scure/base";
-import { randomBytes } from "@noble/hashes/utils";
+import { randomBytes, bytesToHex } from "@noble/hashes/utils";
 import { bech32 } from "bech32";
+import {
+  saveKeysToLocalStorage,
+  getKeysFromLocalStorage,
+} from "./localStorageHelper";
+import { generateSecretKey, getPublicKey } from "nostr-tools";
 
 const utf8Decoder = new TextDecoder("utf-8");
 const utf8Encoder = new TextEncoder();
@@ -51,4 +56,31 @@ function convertNostrPublicKeyToHex(npub) {
   return hex;
 }
 
-export { encrypt, decrypt, convertNostrPublicKeyToHex };
+function generatedOrSavedClientKeys() {
+  let secretKey, publicKey;
+  [secretKey, publicKey] = getKeysFromLocalStorage();
+
+  if (secretKey && publicKey) {
+    return {
+      secretKey,
+      publicKey,
+    };
+  } else {
+    secretKey = generateSecretKey();
+    secretKey = bytesToHex(secretKey);
+    publicKey = getPublicKey(secretKey);
+    saveKeysToLocalStorage(secretKey, publicKey);
+
+    return {
+      secretKey,
+      publicKey,
+    };
+  }
+}
+
+export {
+  encrypt,
+  decrypt,
+  convertNostrPublicKeyToHex,
+  generatedOrSavedClientKeys,
+};

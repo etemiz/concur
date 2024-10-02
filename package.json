@@ -19,6 +19,7 @@
     "react-dom": "^18",
     "react-textarea-autosize": "^8.5.3",
     "scure": "^1.6.0",
+    "sorted-array": "^2.0.4",
     "ws": "^8.18.0"
   },
   "devDependencies": {

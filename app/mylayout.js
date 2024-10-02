@@ -21,15 +21,17 @@ import aiModelsData from "../ai-models.json";
 import BrainSvg from "./svgs/BrainSvg";
 import { usePathname } from "next/navigation";
 import { SimplePool } from "nostr-tools/pool";
-import settings from '../settings.json';
+import settings from "../settings.json";
+import { generatedOrSavedClientKeys } from "./helpers/nip4Helpers";
+import SortedArray from "sorted-array";
 
 let pk_other =
   "npub1chadadwep45t4l7xx9z45p72xsxv7833zyy4tctdgh44lpc50nvsrjex2m";
 // pk_other = "622f2238d33cf54d8c6181a3475e69e9556df60bb57cbf157fd1ea06eeda41de";
 pk_other = convertNostrPublicKeyToHex(pk_other);
+var sorted = new SortedArray([], (a, b) => a.created_at - b.created_at);
 
 export default function MyLayout() {
-
   const pool = new SimplePool();
 
   const selectedAIModelBasedOnPath = () => {
@@ -52,37 +54,64 @@ export default function MyLayout() {
   const [selectedAIModel, setSelectedAIModel] = useState(
     selectedAIModelBasedOnPath()
   );
-  const [testState, setTestState] = useState(false);
   const [numberOfHeaderBrainIcons, setNumberOfHeaderBrainIcons] = useState(0);
 
   const [relayPool, setRelayPool] = useState();
-  
-  const listOfRelays = settings.listOfRelays
+
+  const [connectionGotCutOff, setConnectionGotCutOff] = useState(false);
+
+  const listOfRelays = settings.listOfRelays;
 
   useEffect(() => {
-    let secretKey, publicKey;
-    [secretKey, publicKey] = getKeysFromLocalStorage();
+    let { secretKey, publicKey } = generatedOrSavedClientKeys();
 
-    if (secretKey && publicKey) {
-      setSecretKeyMyself(secretKey);
-      setPublicKeyMyself(publicKey);
-    } else {
-      secretKey = generateSecretKey();
-      secretKey = bytesToHex(secretKey);
-      publicKey = getPublicKey(secretKey);
-
-      setSecretKeyMyself(secretKey);
-      setPublicKeyMyself(publicKey);
-      saveKeysToLocalStorage(secretKey, publicKey);
-    }
+    setSecretKeyMyself(secretKey);
+    setPublicKeyMyself(publicKey);
 
     subscribingToMultipleRelays(secretKey, publicKey);
   }, []);
 
-  const subscribingToMultipleRelays = async (secretKey,publicKey) => {
-    let someArr = [];
-    let end = false;
+  const resubscribeToMultipleRelays = async (created_at_time) => {
+    setConnectionGotCutOff(false);
+    const currentTimeInUnixSeconds = created_at_time;
 
+    relayPool?.close();
+
+    let h = pool.subscribeMany(
+      listOfRelays,
+      [
+        {
+          kinds: [4],
+          authors: [pk_other, publicKeyMyself],
+        },
+      ],
+      {
+        async onevent(event) {
+          console.log(event.created_at < currentTimeInUnixSeconds);
+
+          if (event.created_at < currentTimeInUnixSeconds) return;
+
+          if (
+            event.pubkey === pk_other &&
+            event.tags[0][1] === publicKeyMyself
+          ) {
+            handleBotMessageRecieved(event, secretKeyMyself, publicKeyMyself);
+          }
+          if (
+            event.pubkey === publicKeyMyself &&
+            event.tags[0][1] === pk_other
+          ) {
+            handleMyMessageRecieved(event, secretKeyMyself, publicKeyMyself);
+          }
+        },
+        async oneose() {},
+      }
+    );
+
+    setRelayPool(h);
+  };
+
+  const subscribingToMultipleRelays = async (secretKey, publicKey) => {
     let h = pool.subscribeMany(
       listOfRelays,
       [
@@ -94,83 +123,73 @@ export default function MyLayout() {
       {
         async onevent(event) {
           if (event.pubkey === pk_other && event.tags[0][1] === publicKey) {
-            const newMessageText = await decrypt(
-              secretKey,
-              pk_other,
-              event.content
-            );
-
-            someArr.push({ ...event, text: newMessageText, isUser: false });
-
-            if (end) {
-              setMessageHistory((prev) => [
-                ...prev,
-                { ...event, text: newMessageText, isUser: false },
-              ]);
-
-              setTestState((prev) => !prev);
-            }
+            handleBotMessageRecieved(event, secretKey, publicKey);
           }
           if (event.pubkey === publicKey && event.tags[0][1] === pk_other) {
-            const newMessageText = await decrypt(
-              secretKey,
-              pk_other,
-              event.content
-            );
-            someArr.push({ ...event, text: newMessageText, isUser: true });
-
-            if (end) {
-              setMessageHistory((prev) => [
-                ...prev,
-                { ...event, text: newMessageText, isUser: true },
-              ]);
-              setTestState((prev) => !prev);
-            }
+            handleMyMessageRecieved(event, secretKey, publicKey);
           }
         },
-        async oneose() {
-          someArr = sortByCreatedAt(someArr);
-
-          setMessageHistory([...someArr, selectedAIModelStatusMessage()]);
-          someArr.push(selectedAIModelStatusMessage());
-
-          setTestState((prev) => !prev);
-          end = true;
-        },
+        async oneose() {},
       }
     );
 
     setRelayPool(h);
   };
 
-  useEffect(()=>{
-    return  () => relayPool?.close();
-  }, [])
+  const handleMyMessageRecieved = async (event, secretKey, publicKey) => {
+    const newMessageText = await decrypt(secretKey, pk_other, event.content);
+    const res = sorted.insert({ ...event, text: newMessageText, isUser: true });
+
+    setMessageHistory([...res.array]);
+  };
+
+  const handleBotMessageRecieved = async (event, secretKey, publicKey) => {
+    const newMessageText = await decrypt(secretKey, pk_other, event.content);
+
+    const res = sorted.insert({
+      ...event,
+      text: newMessageText,
+      isUser: false,
+    });
+
+    setMessageHistory([...res.array]);
+  };
+
+  useEffect(() => {
+    return () => relayPool?.close();
+  }, []);
 
   const sendMessage = async () => {
-    let eventTemplate = {
-      pubkey: publicKeyMyself,
-      created_at: Math.floor(Date.now() / 1000),
-      kind: 4,
-      tags: [],
-      content: await encrypt(secretKeyMyself, pk_other, message),
-    };
+    try {
+      let created_at_time = Math.floor(Date.now() / 1000);
+      let eventTemplate = {
+        pubkey: publicKeyMyself,
+        created_at: created_at_time,
+        kind: 4,
+        tags: [],
+        content: await encrypt(secretKeyMyself, pk_other, message),
+      };
 
-    eventTemplate = addTag(eventTemplate, "p", pk_other);
-    eventTemplate = addTag(eventTemplate, "model", selectedAIModel?.model);
+      eventTemplate = addTag(eventTemplate, "p", pk_other);
+      eventTemplate = addTag(eventTemplate, "model", selectedAIModel?.model);
 
-    const signedEvent = finalizeEvent(
-      eventTemplate,
-      hexToBytes(secretKeyMyself)
-    );
+      const signedEvent = finalizeEvent(
+        eventTemplate,
+        hexToBytes(secretKeyMyself)
+      );
 
-    await Promise.any(pool.publish(listOfRelays, signedEvent))
+      await Promise.any(pool.publish(listOfRelays, signedEvent));
 
-    incrementBainIconInHeaderIfLearningRequested(message);
-    setMessage("");
-  }
+      incrementBrainIconInHeaderIfLearningRequested(message);
+      setMessage("");
 
-  const incrementBainIconInHeaderIfLearningRequested = (message) => {
+      if (connectionGotCutOff) resubscribeToMultipleRelays(created_at_time);
+    } catch (error) {
+      setConnectionGotCutOff(true);
+    }
+  };
+
+  const incrementBrainIconInHeaderIfLearningRequested = (message) => {
     const pattern = /learn this:/i;
 
     if (pattern.test(message)) {
@@ -198,8 +217,6 @@ export default function MyLayout() {
     };
   };
 
-  useEffect(() => {}, [testState]);
-
   useEffect(() => {}, [messageHistory.length]);
 
   function sortByCreatedAt(arr) {
@@ -207,22 +224,20 @@ export default function MyLayout() {
       return [];
     }
 
-    return arr.sort((a, b) => a.created_at - b.created_at);
+    return arr.slice().sort((a, b) => a.created_at - b.created_at);
   }
 
   useEffect(() => {
+    sorted.insert(selectedAIModelStatusMessage());
     setMessageHistory([...messageHistory, selectedAIModelStatusMessage()]);
   }, [selectedAIModel]);
-
-  useEffect(() => {}, [messageHistory.length]);
-
-  useEffect(() => {}, [messageHistory.length]);
 
   const selectedAIModelStatusMessage = () => {
     return {
       id: "status-message",
       name: selectedAIModel?.name,
       description: selectedAIModel?.description,
+      created_at: Math.floor(Date.now() / 1000),
     };
   };
 
