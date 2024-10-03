@@ -219,14 +219,6 @@ export default function MyLayout() {
 
   useEffect(() => {}, [messageHistory.length]);
 
-  function sortByCreatedAt(arr) {
-    if (arr.length === 0) {
-      return [];
-    }
-
-    return arr.slice().sort((a, b) => a.created_at - b.created_at);
-  }
-
   useEffect(() => {
     sorted.insert(selectedAIModelStatusMessage());
     setMessageHistory([...messageHistory, selectedAIModelStatusMessage()]);

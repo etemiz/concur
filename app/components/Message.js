@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import aiModelsData from "../../ai-models.json";
+import AddReaction from "../svgs/AddReaction";
+import AddReactionDialog from "./AddReactionDialog";
 const Message = ({ message }) => {
   if (message?.id === "status-message") {
     return <StatusMessage message={message} />;
@@ -38,6 +40,8 @@ const MyMessage = ({ message }) => {
 };
 
 const TheirMessage = ({ message }) => {
+  const [isAddReactionDialogOpen, setIsAddReactionDialogOpen] = useState(false);
+  const [selectedReaction, setSelectedReaction] = useState(null);
   const messageAIModel = (message) => {
     if (message.tags && Array.isArray(message.tags)) {
       for (let tag of message.tags) {
@@ -76,13 +80,25 @@ const TheirMessage = ({ message }) => {
         />
       </div>
       <div className="flex flex-col justify-between">
-        <div className="font-light text-sm px-2 text-gray-600 dark:text-gray-300">
-          {messageAIModelName(message)}
+        <div className="font-light flex text-sm px-2 text-gray-600 dark:text-gray-300 justify-start items-center">
+          <div>{messageAIModelName(message)}</div>
+          <div
+            className="ml-2"
+            onClick={() => setIsAddReactionDialogOpen(true)}
+          >
+            <AddReaction />
+          </div>
         </div>
         <div className="font-light p-3 min-h-12 mt-1 max-w-xl rounded-2xl w-fit min-h-12 bg-gray-200 dark:bg-gray-800 text-black dark:text-gray-100">
           {message?.text}
         </div>
       </div>
+
+      <AddReactionDialog
+        isAddReactionDialogOpen={isAddReactionDialogOpen}
+        setIsAddReactionDialogOpen={setIsAddReactionDialogOpen}
+        setSelectedReaction={setSelectedReaction}
+      />
     </div>
   );
 };

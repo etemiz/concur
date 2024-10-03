@@ -12,7 +12,7 @@ import {
 export default function SelectModelDialog({
   isSelectModelDialogOpen,
   setIsSelectModelDialogOpen,
-  setSelectedAIModel
+  setSelectedAIModel,
 }) {
   return (
     <>
@@ -38,8 +38,8 @@ export default function SelectModelDialog({
                   className="flex items-center p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg"
                   onClick={() => {
                     setIsSelectModelDialogOpen(false);
-                    setSelectedAIModel(aiModel)
-                    window.history.pushState(null, '', aiModel.route);
+                    setSelectedAIModel(aiModel);
+                    window.history.pushState(null, "", aiModel.route);
                   }}
                 >
                   <div className="h-[35px] w-[35px]">
