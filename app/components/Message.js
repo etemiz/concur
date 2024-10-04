@@ -3,14 +3,28 @@ import Image from "next/image";
 import aiModelsData from "../../ai-models.json";
 import AddReaction from "../svgs/AddReaction";
 import AddReactionDialog from "./AddReactionDialog";
-const Message = ({ message }) => {
+const Message = ({
+  message,
+  setAddReactionDialogOpenForMessage,
+  setIsAddReactionDialogOpen,
+  reaction,
+}) => {
   if (message?.id === "status-message") {
     return <StatusMessage message={message} />;
   } else {
     if (message?.isUser) {
       return <MyMessage message={message} />;
     } else {
-      return <TheirMessage message={message} />;
+      return (
+        <TheirMessage
+          message={message}
+          setAddReactionDialogOpenForMessage={
+            setAddReactionDialogOpenForMessage
+          }
+          setIsAddReactionDialogOpen={setIsAddReactionDialogOpen}
+          reaction={reaction}
+        />
+      );
     }
   }
 };
@@ -39,9 +53,12 @@ const MyMessage = ({ message }) => {
   );
 };
 
-const TheirMessage = ({ message }) => {
-  const [isAddReactionDialogOpen, setIsAddReactionDialogOpen] = useState(false);
-  const [selectedReaction, setSelectedReaction] = useState(null);
+const TheirMessage = ({
+  message,
+  setAddReactionDialogOpenForMessage,
+  setIsAddReactionDialogOpen,
+  reaction,
+}) => {
   const messageAIModel = (message) => {
     if (message.tags && Array.isArray(message.tags)) {
       for (let tag of message.tags) {
@@ -82,23 +99,23 @@ const TheirMessage = ({ message }) => {
       <div className="flex flex-col justify-between">
         <div className="font-light flex text-sm px-2 text-gray-600 dark:text-gray-300 justify-start items-center">
           <div>{messageAIModelName(message)}</div>
+          <div>{reaction?.content}</div>
+        </div>
+        <div className="flex items-center">
+          <div className="font-light p-3 min-h-12 mt-1 max-w-xl rounded-2xl w-fit min-h-12 bg-gray-200 dark:bg-gray-800 text-black dark:text-gray-100">
+            {message?.text}
+          </div>
           <div
             className="ml-2"
-            onClick={() => setIsAddReactionDialogOpen(true)}
+            onClick={() => {
+              setAddReactionDialogOpenForMessage(message);
+              setIsAddReactionDialogOpen(true);
+            }}
           >
             <AddReaction />
           </div>
         </div>
-        <div className="font-light p-3 min-h-12 mt-1 max-w-xl rounded-2xl w-fit min-h-12 bg-gray-200 dark:bg-gray-800 text-black dark:text-gray-100">
-          {message?.text}
-        </div>
       </div>
-
-      <AddReactionDialog
-        isAddReactionDialogOpen={isAddReactionDialogOpen}
-        setIsAddReactionDialogOpen={setIsAddReactionDialogOpen}
-        setSelectedReaction={setSelectedReaction}
-      />
     </div>
   );
 };

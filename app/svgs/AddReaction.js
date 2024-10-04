@@ -1,21 +1,42 @@
 const AddReaction = () => {
   return (
-    <div className="flex">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="currentColor"
-        width="20px"
-        height="20px"
-        viewBox="0 0 16 16"
-        className="text-black dark:text-white"
-      >
-        <path
-          d="M11.874 9A4.005 4.005 0 0 1 8 12a4.005 4.005 0 0 1-3.874-3h7.748zM0 8c0-4.418 3.59-8 8-8 4.418 0 8 3.59 8 8 0 4.418-3.59 8-8 8-4.418 0-8-3.59-8-8zm2 0c0 3.307 2.686 6 6 6 3.307 0 6-2.686 6-6 0-3.307-2.686-6-6-6-3.307 0-6 2.686-6 6zm3-3h2v2H5V5zm4 0h2v2H9V5z"
-          fill-rule="evenodd"
-        />
-      </svg>
-      <p className="text-black dark:text-white ml-1 font-black">+</p>
-    </div>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20px"
+      height="20px"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      className="stroke-[#6b7280] dark:stroke-white"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="miter"
+    >
+      <path
+        d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm0,16c-5,0-6-5-6-5H18S17,18,12,18Z"
+        fill="#6b7280"
+        opacity="0.5"
+        strokeWidth="0"
+      />
+      <circle cx="12" cy="12" r="10" />
+      <line
+        x1="8"
+        y1="9"
+        x2="8.01"
+        y2="9"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <line
+        x1="15.99"
+        y1="9"
+        x2="16"
+        y2="9"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path d="M6,13H18s-1,5-6,5S6,13,6,13Z" />
+    </svg>
   );
 };
 

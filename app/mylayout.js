@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import react, { useEffect, useState } from "react";
 import { bytesToHex, randomBytes, hexToBytes } from "@noble/hashes/utils";
 import { bech32 } from "bech32";
 import {
@@ -11,19 +11,30 @@ import Image from "next/image";
 import Message from "./components/Message";
 import TextareaAutosize from "react-textarea-autosize";
 import SelectModelDialog from "./components/SelectModelDialog";
-import { encrypt, decrypt } from "./helpers/nip4Helpers";
 import {
   saveKeysToLocalStorage,
   getKeysFromLocalStorage,
 } from "./helpers/localStorageHelper";
-import { convertNostrPublicKeyToHex } from "./helpers/nip4Helpers";
+import {
+  encrypt,
+  decrypt,
+  convertNostrPublicKeyToHex,
+  generatedOrSavedClientKeys,
+  decryptAndAddBotMessageToMessageHistory,
+  decryptAndAddMyMessageToMessageHistory,
+  handleReactionForAMessageRecieved,
+  isMessageAFeedbackOfBotsResponse,
+  makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInputField,
+  makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField,
+  addTag
+} from "./helpers/nip4Helpers";
 import aiModelsData from "../ai-models.json";
 import BrainSvg from "./svgs/BrainSvg";
 import { usePathname } from "next/navigation";
 import { SimplePool } from "nostr-tools/pool";
 import settings from "../settings.json";
-import { generatedOrSavedClientKeys } from "./helpers/nip4Helpers";
 import SortedArray from "sorted-array";
+import AddReactionDialog from "./components/AddReactionDialog";
 
 let pk_other =
   "npub1chadadwep45t4l7xx9z45p72xsxv7833zyy4tctdgh44lpc50nvsrjex2m";
@@ -55,10 +66,12 @@ export default function MyLayout() {
     selectedAIModelBasedOnPath()
   );
   const [numberOfHeaderBrainIcons, setNumberOfHeaderBrainIcons] = useState(0);
-
   const [relayPool, setRelayPool] = useState();
-
   const [connectionGotCutOff, setConnectionGotCutOff] = useState(false);
+  const [isAddReactionDialogOpen, setIsAddReactionDialogOpen] = useState(false);
+  const [addReactionDialogOpenForMessage, setAddReactionDialogOpenForMessage] =
+    useState(null);
+  const [reactionsOfMessages, setReactionsOfMessages] = useState({});
 
   const listOfRelays = settings.listOfRelays;
 
@@ -87,21 +100,39 @@ export default function MyLayout() {
       ],
       {
         async onevent(event) {
-          console.log(event.created_at < currentTimeInUnixSeconds);
-
           if (event.created_at < currentTimeInUnixSeconds) return;
+
+          if (event.kind == 7) {
+            if (event.pubkey === publicKey && event.tags[0][1] === pk_other) {
+              handleReactionForAMessageRecieved(event, setReactionsOfMessages);
+            }
+
+            return;
+          }
 
           if (
             event.pubkey === pk_other &&
             event.tags[0][1] === publicKeyMyself
           ) {
-            handleBotMessageRecieved(event, secretKeyMyself, publicKeyMyself);
+            decryptAndAddBotMessageToMessageHistory(
+              event,
+              secretKeyMyself,
+              pk_other,
+              sorted,
+              setMessageHistory
+            );
           }
           if (
             event.pubkey === publicKeyMyself &&
             event.tags[0][1] === pk_other
           ) {
-            handleMyMessageRecieved(event, secretKeyMyself, publicKeyMyself);
+            decryptAndAddMyMessageToMessageHistory(
+              event,
+              secretKeyMyself,
+              pk_other,
+              sorted,
+              setMessageHistory
+            );
           }
         },
         async oneose() {},
@@ -116,17 +147,37 @@ export default function MyLayout() {
       listOfRelays,
       [
         {
-          kinds: [4],
+          kinds: [4, 7],
           authors: [pk_other, publicKey],
         },
       ],
       {
         async onevent(event) {
+          if (event.kind == 7) {
+            if (event.pubkey === publicKey && event.tags[0][1] === pk_other) {
+              handleReactionForAMessageRecieved(event, setReactionsOfMessages);
+            }
+
+            return;
+          }
+
           if (event.pubkey === pk_other && event.tags[0][1] === publicKey) {
-            handleBotMessageRecieved(event, secretKey, publicKey);
+            decryptAndAddBotMessageToMessageHistory(
+              event,
+              secretKey,
+              pk_other,
+              sorted,
+              setMessageHistory
+            );
           }
           if (event.pubkey === publicKey && event.tags[0][1] === pk_other) {
-            handleMyMessageRecieved(event, secretKey, publicKey);
+            decryptAndAddMyMessageToMessageHistory(
+              event,
+              secretKey,
+              pk_other,
+              sorted,
+              setMessageHistory
+            );
           }
         },
         async oneose() {},
@@ -136,57 +187,41 @@ export default function MyLayout() {
     setRelayPool(h);
   };
 
-  const handleMyMessageRecieved = async (event, secretKey, publicKey) => {
-    const newMessageText = await decrypt(secretKey, pk_other, event.content);
-    const res = sorted.insert({ ...event, text: newMessageText, isUser: true });
-
-    setMessageHistory([...res.array]);
-  };
-
-  const handleBotMessageRecieved = async (event, secretKey, publicKey) => {
-    const newMessageText = await decrypt(secretKey, pk_other, event.content);
-
-    const res = sorted.insert({
-      ...event,
-      text: newMessageText,
-      isUser: false,
-    });
-
-    setMessageHistory([...res.array]);
-  };
-
   useEffect(() => {
     return () => relayPool?.close();
   }, []);
 
   const sendMessage = async () => {
-    try {
-      let created_at_time = Math.floor(Date.now() / 1000);
-      let eventTemplate = {
-        pubkey: publicKeyMyself,
-        created_at: created_at_time,
-        kind: 4,
-        tags: [],
-        content: await encrypt(secretKeyMyself, pk_other, message),
-      };
-
-      eventTemplate = addTag(eventTemplate, "p", pk_other);
-      eventTemplate = addTag(eventTemplate, "model", selectedAIModel?.model);
-
-      const signedEvent = finalizeEvent(
-        eventTemplate,
-        hexToBytes(secretKeyMyself)
+    if (isMessageAFeedbackOfBotsResponse(message)) {
+      makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInputField(
+        publicKeyMyself,
+        secretKeyMyself,
+        pk_other,
+        message,
+        addReactionDialogOpenForMessage,
+        connectionGotCutOff,
+        resubscribeToMultipleRelays,
+        pool,
+        listOfRelays,
+        setMessage,
+        setConnectionGotCutOff
       );
-
-      await Promise.any(pool.publish(listOfRelays, signedEvent));
-
-      incrementBrainIconInHeaderIfLearningRequested(message);
-      setMessage("");
-
-      if (connectionGotCutOff) resubscribeToMultipleRelays(created_at_time);
-    } catch (error) {
-      setConnectionGotCutOff(true);
+    } else {
+      makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField(
+        publicKeyMyself,
+        secretKeyMyself,
+        pk_other,
+        message,
+        connectionGotCutOff,
+        resubscribeToMultipleRelays,
+        pool,
+        listOfRelays,
+        setMessage,
+        setConnectionGotCutOff,
+        selectedAIModel
+      );
     }
+    incrementBrainIconInHeaderIfLearningRequested(message);
   };
 
   const incrementBrainIconInHeaderIfLearningRequested = (message) => {
@@ -210,13 +245,6 @@ export default function MyLayout() {
     }
   };
 
-  const addTag = (event, tagKey, tagValue) => {
-    return {
-      ...event,
-      tags: [...event.tags, [tagKey, tagValue]],
-    };
-  };
-
   useEffect(() => {}, [messageHistory.length]);
 
   useEffect(() => {
@@ -231,6 +259,45 @@ export default function MyLayout() {
       description: selectedAIModel?.description,
       created_at: Math.floor(Date.now() / 1000),
     };
+  };
+
+  const handleReactionOnMessage = async (reaction) => {
+    try {
+      let created_at_time = Math.floor(Date.now() / 1000);
+      let eventTemplate = {
+        pubkey: publicKeyMyself,
+        created_at: created_at_time,
+        kind: 7,
+        tags: [],
+        content: reaction,
+      };
+
+      eventTemplate = addTag(eventTemplate, "p", pk_other);
+      eventTemplate = addTag(
+        eventTemplate,
+        "e",
+        addReactionDialogOpenForMessage?.id
+      );
+
+      const signedEvent = finalizeEvent(
+        eventTemplate,
+        hexToBytes(secretKeyMyself)
+      );
+
+      await Promise.any(pool.publish(listOfRelays, signedEvent));
+
+      setInputValueForFeedbackIfMessageIsDisliked(reaction);
+
+      if (connectionGotCutOff) resubscribeToMultipleRelays(created_at_time);
+    } catch (error) {
+      setConnectionGotCutOff(true);
+    }
+  };
+
+  const setInputValueForFeedbackIfMessageIsDisliked = (reaction) => {
+    if (reaction === "👎") {
+      setMessage(`Preferred answer: ${addReactionDialogOpenForMessage?.text}`);
+    }
   };
 
   return (
@@ -305,7 +372,15 @@ export default function MyLayout() {
         <div className="overflow-y-auto flex-grow justify-end text-black dark:text-gray-100 p-4 max-w-3xl mx-auto w-full">
           {messageHistory.map((message) => {
             return (
-              <Message key={message.id + Math.random()} message={message} />
+              <Message
+                key={message.id + Math.random()}
+                message={message}
+                setAddReactionDialogOpenForMessage={
+                  setAddReactionDialogOpenForMessage
+                }
+                setIsAddReactionDialogOpen={setIsAddReactionDialogOpen}
+                reaction={reactionsOfMessages[message.id]}
+              />
             );
           })}
           <div className="h-[100px] bg-transparent"></div>
@@ -347,6 +422,11 @@ export default function MyLayout() {
         isSelectModelDialogOpen={isSelectModelDialogOpen}
         setIsSelectModelDialogOpen={setIsSelectModelDialogOpen}
         setSelectedAIModel={setSelectedAIModel}
+      />
+      <AddReactionDialog
+        isAddReactionDialogOpen={isAddReactionDialogOpen}
+        setIsAddReactionDialogOpen={setIsAddReactionDialogOpen}
+        handleReactionOnMessage={handleReactionOnMessage}
       />
     </div>
   );

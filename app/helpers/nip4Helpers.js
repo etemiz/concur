@@ -1,13 +1,18 @@
 import { cbc } from "@noble/ciphers/aes";
 import { secp256k1 } from "@noble/curves/secp256k1";
 import { base64 } from "@scure/base";
-import { randomBytes, bytesToHex } from "@noble/hashes/utils";
+import { randomBytes, bytesToHex, hexToBytes } from "@noble/hashes/utils";
 import { bech32 } from "bech32";
 import {
   saveKeysToLocalStorage,
   getKeysFromLocalStorage,
 } from "./localStorageHelper";
 import { generateSecretKey, getPublicKey } from "nostr-tools";
+import {
+  // generateSecretKey,
+  // getPublicKey,
+  finalizeEvent,
+} from "nostr-tools/pure";
 
 const utf8Decoder = new TextDecoder("utf-8");
 const utf8Encoder = new TextEncoder();
@@ -78,9 +83,168 @@ function generatedOrSavedClientKeys() {
   }
 }
 
+async function decryptAndAddBotMessageToMessageHistory(
+  event,
+  secretKey,
+  pk_other,
+  sorted,
+  setMessageHistory
+) {
+  const newMessageText = await decrypt(secretKey, pk_other, event.content);
+
+  const res = sorted.insert({
+    ...event,
+    text: newMessageText,
+    isUser: false,
+  });
+
+  setMessageHistory([...res.array]);
+}
+
+async function decryptAndAddMyMessageToMessageHistory(
+  event,
+  secretKey,
+  pk_other,
+  sorted,
+  setMessageHistory
+) {
+  const newMessageText = await decrypt(secretKey, pk_other, event.content);
+  const res = sorted.insert({ ...event, text: newMessageText, isUser: true });
+
+  setMessageHistory([...res.array]);
+}
+
+const handleReactionForAMessageRecieved = (event, setReactionsOfMessages) => {
+  const messageId = event.tags[1][1];
+  const newEvent = event;
+  const newCreatedAt = newEvent.created_at;
+
+  setReactionsOfMessages((prevReactions) => {
+    const existingEvent = prevReactions[messageId];
+
+    if (!existingEvent || newCreatedAt > existingEvent.created_at) {
+      return {
+        ...prevReactions,
+        [messageId]: newEvent,
+      };
+    }
+
+    return prevReactions;
+  });
+};
+
+const isMessageAFeedbackOfBotsResponse = (message) => {
+  if (message?.includes("Preferred answer:")) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+async function makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInputField(
+  publicKeyMyself,
+  secretKeyMyself,
+  pk_other,
+  message,
+  addReactionDialogOpenForMessage,
+  connectionGotCutOff,
+  resubscribeToMultipleRelays,
+  pool,
+  listOfRelays,
+  setMessage,
+  setConnectionGotCutOff
+) {
+  try {
+    let created_at_time = Math.floor(Date.now() / 1000);
+    let eventTemplate = {
+      pubkey: publicKeyMyself,
+      created_at: created_at_time,
+      kind: 4,
+      tags: [],
+      content: await encrypt(secretKeyMyself, pk_other, message),
+    };
+
+    eventTemplate = addTag(eventTemplate, "p", pk_other);
+    eventTemplate = addTag(eventTemplate, "preferred", "1");
+    eventTemplate = addTag(
+      eventTemplate,
+      "e",
+      addReactionDialogOpenForMessage?.id
+    );
+
+    const signedEvent = finalizeEvent(
+      eventTemplate,
+      hexToBytes(secretKeyMyself)
+    );
+
+    if (connectionGotCutOff) resubscribeToMultipleRelays(created_at_time);
+
+    await Promise.any(pool.publish(listOfRelays, signedEvent));
+
+    setMessage("");
+  } catch (error) {
+    setConnectionGotCutOff(true);
+  }
+}
+
+async function makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField(
+  publicKeyMyself,
+  secretKeyMyself,
+  pk_other,
+  message,
+  connectionGotCutOff,
+  resubscribeToMultipleRelays,
+  pool,
+  listOfRelays,
+  setMessage,
+  setConnectionGotCutOff,
+  selectedAIModel
+) {
+  try {
+    let created_at_time = Math.floor(Date.now() / 1000);
+    let eventTemplate = {
+      pubkey: publicKeyMyself,
+      created_at: created_at_time,
+      kind: 4,
+      tags: [],
+      content: await encrypt(secretKeyMyself, pk_other, message),
+    };
+
+    eventTemplate = addTag(eventTemplate, "p", pk_other);
+    eventTemplate = addTag(eventTemplate, "model", selectedAIModel?.model);
+
+    const signedEvent = finalizeEvent(
+      eventTemplate,
+      hexToBytes(secretKeyMyself)
+    );
+
+    if (connectionGotCutOff) resubscribeToMultipleRelays(created_at_time);
+
+    await Promise.any(pool.publish(listOfRelays, signedEvent));
+
+    setMessage("");
+  } catch (error) {
+    setConnectionGotCutOff(true);
+  }
+}
+
+const addTag = (event, tagKey, tagValue) => {
+  return {
+    ...event,
+    tags: [...event.tags, [tagKey, tagValue]],
+  };
+};
+
 export {
   encrypt,
   decrypt,
   convertNostrPublicKeyToHex,
   generatedOrSavedClientKeys,
+  decryptAndAddBotMessageToMessageHistory,
+  decryptAndAddMyMessageToMessageHistory,
+  handleReactionForAMessageRecieved,
+  isMessageAFeedbackOfBotsResponse,
+  makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInputField,
+  makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField,
+  addTag,
 };

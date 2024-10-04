@@ -11,7 +11,7 @@ import {
 export default function AddReactionDialog({
   isAddReactionDialogOpen,
   setIsAddReactionDialogOpen,
-  setSelectedReaction,
+  handleReactionOnMessage,
 }) {
   return (
     <>
@@ -37,21 +37,22 @@ export default function AddReactionDialog({
                   width={50}
                   height={50}
                   alt="Like"
-                  className="mx-auto"
-                />
-                <Image
-                  src="/heart.png"
-                  width={50}
-                  height={50}
-                  alt="Heart"
-                  className="mx-auto"
+                  className="mx-auto hover:scale-110"
+                  onClick={() => {
+                    setIsAddReactionDialogOpen(false);
+                    handleReactionOnMessage("👍");
+                  }}
                 />
                 <Image
                   src="/dislike.png"
                   width={50}
                   height={50}
                   alt="Dislike"
-                  className="mx-auto"
+                  className="mx-auto hover:scale-110"
+                  onClick={() => {
+                    setIsAddReactionDialogOpen(false);
+                    handleReactionOnMessage("👎");
+                  }}
                 />
               </div>
             </DialogPanel>
