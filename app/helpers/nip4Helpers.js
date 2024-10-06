@@ -184,6 +184,7 @@ async function makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInpu
     setMessage("");
   } catch (error) {
     setConnectionGotCutOff(true);
+    console.error(error);
   }
 }
 
@@ -225,6 +226,7 @@ async function makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputF
     setMessage("");
   } catch (error) {
     setConnectionGotCutOff(true);
+    console.error(error);
   }
 }
 

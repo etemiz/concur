@@ -1,5 +1,5 @@
 "use client";
-import react, { useEffect, useState } from "react";
+import react, { useEffect, useState, useRef } from "react";
 import { bytesToHex, randomBytes, hexToBytes } from "@noble/hashes/utils";
 import { bech32 } from "bech32";
 import {
@@ -8,7 +8,7 @@ import {
   finalizeEvent,
 } from "nostr-tools/pure";
 import Image from "next/image";
-import Message from "./components/Message";
+import Messages from "./components/Message";
 import TextareaAutosize from "react-textarea-autosize";
 import SelectModelDialog from "./components/SelectModelDialog";
 import {
@@ -26,7 +26,7 @@ import {
   isMessageAFeedbackOfBotsResponse,
   makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInputField,
   makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField,
-  addTag
+  addTag,
 } from "./helpers/nip4Helpers";
 import aiModelsData from "../ai-models.json";
 import BrainSvg from "./svgs/BrainSvg";
@@ -71,9 +71,12 @@ export default function MyLayout() {
   const [isAddReactionDialogOpen, setIsAddReactionDialogOpen] = useState(false);
   const [addReactionDialogOpenForMessage, setAddReactionDialogOpenForMessage] =
     useState(null);
+  const [feedbackForMessage, setFeedbackForMessage] = useState(null);
   const [reactionsOfMessages, setReactionsOfMessages] = useState({});
 
   const listOfRelays = settings.listOfRelays;
+
+  const messageInputFieldRef = useRef();
 
   useEffect(() => {
     let { secretKey, publicKey } = generatedOrSavedClientKeys();
@@ -198,7 +201,7 @@ export default function MyLayout() {
         secretKeyMyself,
         pk_other,
         message,
-        addReactionDialogOpenForMessage,
+        feedbackForMessage,
         connectionGotCutOff,
         resubscribeToMultipleRelays,
         pool,
@@ -222,6 +225,22 @@ export default function MyLayout() {
       );
     }
     incrementBrainIconInHeaderIfLearningRequested(message);
+  };
+
+  const sendDefaultMessageOfAiModel = (message) => {
+    makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField(
+      publicKeyMyself,
+      secretKeyMyself,
+      pk_other,
+      message,
+      connectionGotCutOff,
+      resubscribeToMultipleRelays,
+      pool,
+      listOfRelays,
+      setMessage,
+      setConnectionGotCutOff,
+      selectedAIModel
+    );
   };
 
   const incrementBrainIconInHeaderIfLearningRequested = (message) => {
@@ -257,6 +276,7 @@ export default function MyLayout() {
       id: "status-message",
       name: selectedAIModel?.name,
       description: selectedAIModel?.description,
+      questions: selectedAIModel?.questions,
       created_at: Math.floor(Date.now() / 1000),
     };
   };
@@ -286,7 +306,7 @@ export default function MyLayout() {
 
       await Promise.any(pool.publish(listOfRelays, signedEvent));
 
-      setInputValueForFeedbackIfMessageIsDisliked(reaction);
+      // setInputValueForFeedbackIfMessageIsDisliked(reaction);
 
       if (connectionGotCutOff) resubscribeToMultipleRelays(created_at_time);
     } catch (error) {
@@ -294,10 +314,8 @@ export default function MyLayout() {
     }
   };
 
-  const setInputValueForFeedbackIfMessageIsDisliked = (reaction) => {
-    if (reaction === "👎") {
-      setMessage(`Preferred answer: ${addReactionDialogOpenForMessage?.text}`);
-    }
+  const setInputValueForFeedbackIfDislikedMessageIsEdited = (message) => {
+    setMessage(`Preferred answer: ${message?.text}`);
   };
 
   return (
@@ -369,34 +387,34 @@ export default function MyLayout() {
       </div>
 
       <div className="overflow-y-auto flex-grow justify-end w-full">
-        <div className="overflow-y-auto flex-grow justify-end text-black dark:text-gray-100 p-4 max-w-3xl mx-auto w-full">
-          {messageHistory.map((message) => {
-            return (
-              <Message
-                key={message.id + Math.random()}
-                message={message}
-                setAddReactionDialogOpenForMessage={
-                  setAddReactionDialogOpenForMessage
-                }
-                setIsAddReactionDialogOpen={setIsAddReactionDialogOpen}
-                reaction={reactionsOfMessages[message.id]}
-              />
-            );
-          })}
-          <div className="h-[100px] bg-transparent"></div>
-        </div>
+        {
+          <Messages
+            messageHistory={messageHistory}
+            messageInputFieldRef={messageInputFieldRef}
+            setAddReactionDialogOpenForMessage={
+              setAddReactionDialogOpenForMessage
+            }
+            setIsAddReactionDialogOpen={setIsAddReactionDialogOpen}
+            reactionsOfMessages={reactionsOfMessages}
+            sendDefaultMessageOfAiModel={sendDefaultMessageOfAiModel}
+            setInputValueForFeedbackIfDislikedMessageIsEdited={
+              setInputValueForFeedbackIfDislikedMessageIsEdited
+            }
+            setFeedbackForMessage={setFeedbackForMessage}
+          />
+        }
       </div>
-      <div className="h-[100px] bg-transparent"></div>
       <div className="w-full px-8 pb-3 fixed bottom-0 bg-[#FFFFFF] dark:bg-[#111827]">
         <div className="flex rounded-[30px] max-w-3xl mx-auto items-center p-3 text-black dark:text-gray-100 w-full border border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-800">
           <TextareaAutosize
-            className="w-full border-none bg-transparent dark:bg-transparent focus:outline-none focus:ring-0"
+            className="w-full border-none bg-transparent dark:bg-transparent focus:outline-none focus:ring-0 resize-none"
             minRows={1}
             maxRows={6}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Message here..."
             onKeyDown={handleKeyDown}
+            ref={messageInputFieldRef}
           />
 
           <button

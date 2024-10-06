@@ -4,62 +4,98 @@
     "name": "O.S.",
     "description": "Generalist, Libertarian",
     "bot": "1",
-    "route": "/os"
+    "route": "/os",
+    "questions": [
+      "Can prolonged fasting lead to permanent loss of muscle mass?",
+      "Is there a link between heavy metals in the environment and health problems?"
+    ]
   },
   {
     "model": "def-kc",
     "name": "K.C.",
     "description": "Doctor, Nutrition",
     "bot": "2",
-    "route": "/kc"
+    "route": "/kc",
+    "questions": [
+      "Is there a connection between red meat and heart disease?",
+      "Is the study of phytochemicals a promising area of research?"
+    ]
   },
   {
     "model": "def-jn",
     "name": "J.N.",
     "description": "Alternative medicine, Nutrition",
     "bot": "3",
-    "route": "/jn"
+    "route": "/jn",
+    "questions": [
+      "Can mindfulness meditation improve chronic pain?",
+      "Is a flexitarian diet the most sustainable option?"
+    ]
   },
   {
     "model": "def-dc",
     "name": "D.C.",
     "description": "Vaccine Researcher",
     "bot": "4",
-    "route": "/dc"
+    "route": "/dc",
+    "questions": [
+      "Are mandatory vaccines a violation of personal freedom?",
+      "Is the use of antibiotics in livestock production necessary and safe, or is it contributing to the rise of antibiotic-resistant bacteria?"
+    ]
   },
   {
     "model": "def-ec",
     "name": "E.C.",
     "description": "Keto, Intermittent fasting",
     "bot": "5",
-    "route": "/ec"
+    "route": "/ec",
+    "questions": [
+      "Is intermittent fasting safe?",
+      "Are low-fat diets really healthier than high-fat diets, or has this belief been based on flawed science?"
+    ]
   },
   {
     "model": "def-ce",
     "name": "C.E.",
     "description": "A truth seeker",
     "bot": "6",
-    "route": "/ce"
+    "route": "/ce",
+    "questions": [
+      "Is permaculture a more cost-effective way to produce food?",
+      "Does the consumption of alkaline water improve health?"
+    ]
   },
   {
     "model": "def-sf",
     "name": "S.F.",
     "description": "Chiropractor, Healing",
     "bot": "7",
-    "route": "/sf"
+    "route": "/sf",
+    "questions": [
+      "Can crystals heal emotional trauma?",
+      "Do herbal extracts have a stronger therapeutic effect than whole herbs?"
+    ]
   },
   {
     "model": "def-jg",
     "name": "J.G.",
     "description": "Diabetes, Fasting",
     "bot": "8",
-    "route": "/jg"
+    "route": "/jg",
+    "questions": [
+      "Should pregnant women fast for health benefits?",
+      "How can you target fat loss in your abdomen?"
+    ]
   },
   {
     "model": "def-mr",
     "name": "M.R.",
     "description": "Fasting, Detoxing",
     "bot": "9",
-    "route": "/mr"
+    "route": "/mr",
+    "questions": [
+      "Are detox foot pads a scam?",
+      "Can juice fasts detoxify the body?"
+    ]
   }
 ]

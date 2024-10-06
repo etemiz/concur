@@ -29,31 +29,35 @@ export default function AddReactionDialog({
           <div className="flex min-h-full items-center justify-center p-4">
             <DialogPanel
               transition
-              className="w-full max-w-md rounded-xl bg-white dark:bg-gray-800  p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+              className="max-w-md rounded-xl bg-white dark:bg-gray-800  p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
             >
               <div className="flex justify-between">
-                <Image
-                  src="/like.png"
-                  width={50}
-                  height={50}
-                  alt="Like"
-                  className="mx-auto hover:scale-110"
-                  onClick={() => {
-                    setIsAddReactionDialogOpen(false);
-                    handleReactionOnMessage("👍");
-                  }}
-                />
-                <Image
-                  src="/dislike.png"
-                  width={50}
-                  height={50}
-                  alt="Dislike"
-                  className="mx-auto hover:scale-110"
-                  onClick={() => {
-                    setIsAddReactionDialogOpen(false);
-                    handleReactionOnMessage("👎");
-                  }}
-                />
+                <div className="p-2">
+                  <Image
+                    src="/like.png"
+                    width={50}
+                    height={50}
+                    alt="Like"
+                    className="hover:scale-110"
+                    onClick={() => {
+                      setIsAddReactionDialogOpen(false);
+                      handleReactionOnMessage("❤️");
+                    }}
+                  />
+                </div>
+                <div className="p-2">
+                  <Image
+                    src="/dislike.png"
+                    width={50}
+                    height={50}
+                    alt="Dislike"
+                    className="hover:scale-110"
+                    onClick={() => {
+                      setIsAddReactionDialogOpen(false);
+                      handleReactionOnMessage("👎");
+                    }}
+                  />
+                </div>
               </div>
             </DialogPanel>
           </div>

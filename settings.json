@@ -2,6 +2,7 @@
   "listOfRelays": [
     "wss://nostr.mom",
     "wss://relay.primal.net",
-    "wss://relay.nos.social"
+    "wss://relay.nos.social",
+    "wss://relay.damus.io"
   ]
 }
