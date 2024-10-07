@@ -2,8 +2,8 @@ const AddReaction = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="20px"
-      height="20px"
+      width="1.25rem"
+      height="1.25rem"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

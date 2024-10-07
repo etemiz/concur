@@ -237,6 +237,47 @@ const addTag = (event, tagKey, tagValue) => {
   };
 };
 
+const sendARetryMessage = async (
+  publicKeyMyself,
+  secretKeyMyself,
+  pk_other,
+  referencedMessageId,
+  connectionGotCutOff,
+  resubscribeToMultipleRelays,
+  pool,
+  listOfRelays,
+  setMessage,
+  setConnectionGotCutOff
+) => {
+  try {
+    let created_at_time = Math.floor(Date.now() / 1000);
+    let eventTemplate = {
+      pubkey: publicKeyMyself,
+      created_at: created_at_time,
+      kind: 4,
+      tags: [],
+      content: await encrypt(secretKeyMyself, pk_other, "Retry"),
+    };
+
+    eventTemplate = addTag(eventTemplate, "p", pk_other);
+    eventTemplate = addTag(eventTemplate, "e", referencedMessageId);
+
+    const signedEvent = finalizeEvent(
+      eventTemplate,
+      hexToBytes(secretKeyMyself)
+    );
+
+    if (connectionGotCutOff) resubscribeToMultipleRelays(created_at_time);
+
+    await Promise.any(pool.publish(listOfRelays, signedEvent));
+
+    setMessage("");
+  } catch (error) {
+    setConnectionGotCutOff(true);
+    console.error(error);
+  }
+};
+
 export {
   encrypt,
   decrypt,
@@ -249,4 +290,5 @@ export {
   makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInputField,
   makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField,
   addTag,
+  sendARetryMessage,
 };

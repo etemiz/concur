@@ -27,6 +27,7 @@ import {
   makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInputField,
   makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField,
   addTag,
+  sendARetryMessage,
 } from "./helpers/nip4Helpers";
 import aiModelsData from "../ai-models.json";
 import BrainSvg from "./svgs/BrainSvg";
@@ -77,6 +78,8 @@ export default function MyLayout() {
   const listOfRelays = settings.listOfRelays;
 
   const messageInputFieldRef = useRef();
+
+  const bottomOfMessageHistoryList = useRef(null);
 
   useEffect(() => {
     let { secretKey, publicKey } = generatedOrSavedClientKeys();
@@ -318,8 +321,31 @@ export default function MyLayout() {
     setMessage(`Preferred answer: ${message?.text}`);
   };
 
+  useEffect(() => {
+    if (bottomOfMessageHistoryList.current) {
+      bottomOfMessageHistoryList.current?.scrollIntoView({
+        behavior: "smooth",
+      });
+    }
+  }, [messageHistory]);
+
+  const retryAMessage = async (selectedMessage) => {
+    sendARetryMessage(
+      publicKeyMyself,
+      secretKeyMyself,
+      pk_other,
+      selectedMessage?.id,
+      connectionGotCutOff,
+      resubscribeToMultipleRelays,
+      pool,
+      listOfRelays,
+      setMessage,
+      setConnectionGotCutOff
+    );
+  };
+
   return (
-    <div className="font-roboto h-[100vh] max-h-[100vh] flex flex-col justify-between bg-white dark:bg-gray-900">
+    <div className="font-roboto h-[100dvh] max-h-[100dvh] flex flex-col justify-between bg-white dark:bg-gray-900">
       <div className="py-4 flex items-center">
         <div
           className="p-2 m-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
@@ -328,8 +354,8 @@ export default function MyLayout() {
           <svg
             xmlns="http://www.w3.org/2000/svg"
             version="1.0"
-            width="20.000000pt"
-            height="20.000000pt"
+            width="1.25rem"
+            height="1.25rem"
             viewBox="0 0 500.000000 500.000000"
             preserveAspectRatio="xMidYMid meet"
             className="text-black dark:text-white"
@@ -362,7 +388,7 @@ export default function MyLayout() {
             <div className="text-md font-semi-bold line-clamp-1 text-ellipsis break-anywhere overflow-hidden whitespace-normal font-roboto dark:text-gray-200">
               {selectedAIModel.name} {selectedAIModel.description}
             </div>
-            <div className="text-[13px] text-[#6b6b6b] dark:text-gray-400">
+            <div className="text-[0.813rem] text-[#6b6b6b] dark:text-gray-400">
               Contact:{" "}
               <a
                 className="decoration-solid underline"
@@ -386,26 +412,27 @@ export default function MyLayout() {
         )}
       </div>
 
-      <div className="overflow-y-auto flex-grow justify-end w-full">
-        {
-          <Messages
-            messageHistory={messageHistory}
-            messageInputFieldRef={messageInputFieldRef}
-            setAddReactionDialogOpenForMessage={
-              setAddReactionDialogOpenForMessage
-            }
-            setIsAddReactionDialogOpen={setIsAddReactionDialogOpen}
-            reactionsOfMessages={reactionsOfMessages}
-            sendDefaultMessageOfAiModel={sendDefaultMessageOfAiModel}
-            setInputValueForFeedbackIfDislikedMessageIsEdited={
-              setInputValueForFeedbackIfDislikedMessageIsEdited
-            }
-            setFeedbackForMessage={setFeedbackForMessage}
-          />
-        }
-      </div>
-      <div className="w-full px-8 pb-3 fixed bottom-0 bg-[#FFFFFF] dark:bg-[#111827]">
-        <div className="flex rounded-[30px] max-w-3xl mx-auto items-center p-3 text-black dark:text-gray-100 w-full border border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-800">
+      {
+        <Messages
+          messageHistory={messageHistory}
+          messageInputFieldRef={messageInputFieldRef}
+          setAddReactionDialogOpenForMessage={
+            setAddReactionDialogOpenForMessage
+          }
+          setIsAddReactionDialogOpen={setIsAddReactionDialogOpen}
+          reactionsOfMessages={reactionsOfMessages}
+          sendDefaultMessageOfAiModel={sendDefaultMessageOfAiModel}
+          setInputValueForFeedbackIfDislikedMessageIsEdited={
+            setInputValueForFeedbackIfDislikedMessageIsEdited
+          }
+          setFeedbackForMessage={setFeedbackForMessage}
+          bottomOfMessageHistoryList={bottomOfMessageHistoryList}
+          retryAMessage={retryAMessage}
+        />
+      }
+
+      <div className="w-full px-8 pb-3 bottom-0 bg-[#FFFFFF] dark:bg-[#111827]">
+        <div className="flex rounded-[1.875rem] max-w-3xl mx-auto items-center p-3 text-black dark:text-gray-100 w-full border border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-800">
           <TextareaAutosize
             className="w-full border-none bg-transparent dark:bg-transparent focus:outline-none focus:ring-0 resize-none"
             minRows={1}
@@ -425,7 +452,7 @@ export default function MyLayout() {
             <svg
               viewBox="0 0 24 24"
               fill="none"
-              height="1.25em"
+              height="1.25rem"
               className="text-white dark:text-black"
             >
               <path
