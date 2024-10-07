@@ -431,7 +431,7 @@ export default function MyLayout() {
         />
       }
 
-      <div className="w-full px-8 pb-3 bottom-0 bg-[#FFFFFF] dark:bg-[#111827]">
+      <div className="w-full px-4 pb-3 bottom-0 bg-[#FFFFFF] dark:bg-[#111827]">
         <div className="flex rounded-[1.875rem] max-w-3xl mx-auto items-center p-3 text-black dark:text-gray-100 w-full border border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-800">
           <TextareaAutosize
             className="w-full border-none bg-transparent dark:bg-transparent focus:outline-none focus:ring-0 resize-none"
