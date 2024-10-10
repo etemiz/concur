@@ -3,6 +3,7 @@
     "model": "def",
     "name": "O.S.",
     "description": "Generalist, Libertarian",
+    "image": "/BotPic.png",
     "bot": "1",
     "route": "/os",
     "questions": [
@@ -14,6 +15,7 @@
     "model": "def-kc",
     "name": "K.C.",
     "description": "Doctor, Nutrition",
+    "image": "https://thumbs.dreamstime.com/z/healthy-organic-diet-nutrition-illustration-concept-doctor-depicting-good-health-depends-lifestyle-305157235.jpg?w=576",
     "bot": "2",
     "route": "/kc",
     "questions": [
@@ -25,6 +27,7 @@
     "model": "def-jn",
     "name": "J.N.",
     "description": "Alternative medicine, Nutrition",
+    "image": "https://images.nightcafe.studio/jobs/rKQggpxhPkIM31jO2vGV/rKQggpxhPkIM31jO2vGV--1--5kyci.jpg?tr=w-1600,c-at_max",
     "bot": "3",
     "route": "/jn",
     "questions": [
@@ -36,6 +39,7 @@
     "model": "def-dc",
     "name": "D.C.",
     "description": "Vaccine Researcher",
+    "image": "https://static.vecteezy.com/system/resources/previews/014/004/586/large_2x/research-of-covid-19-virus-vaccine-concept-young-woman-scientist-in-medical-medical-face-mask-looking-at-syringe-in-laboratory-doing-some-research-illustration-free-vector.jpg",
     "bot": "4",
     "route": "/dc",
     "questions": [
@@ -47,6 +51,7 @@
     "model": "def-ec",
     "name": "E.C.",
     "description": "Keto, Intermittent fasting",
+    "image": "https://cdn.vectorstock.com/i/1000x1000/43/39/vegetable-healthy-diet-vector-22714339.webp",
     "bot": "5",
     "route": "/ec",
     "questions": [
@@ -58,6 +63,7 @@
     "model": "def-ce",
     "name": "C.E.",
     "description": "A truth seeker",
+    "image": "https://img.freepik.com/premium-photo/sherlock-holmes-vector-illustration_996136-3008.jpg",
     "bot": "6",
     "route": "/ce",
     "questions": [
@@ -69,6 +75,7 @@
     "model": "def-sf",
     "name": "S.F.",
     "description": "Chiropractor, Healing",
+    "image": "https://as1.ftcdn.net/v2/jpg/03/11/30/56/1000_F_311305698_JqH1TIwCpCnOHM9BRAr0Xu0kksrTbxdk.jpg",
     "bot": "7",
     "route": "/sf",
     "questions": [
@@ -80,6 +87,7 @@
     "model": "def-jg",
     "name": "J.G.",
     "description": "Diabetes, Fasting",
+    "image": "https://img.freepik.com/free-vector/diabetes-concept-illustration_114360-3670.jpg?t=st=1728433071~exp=1728436671~hmac=fc053ce8e5affd8840ca532192bd2f8fe326459b08a77932119ab63b9e8d4db9&w=740",
     "bot": "8",
     "route": "/jg",
     "questions": [
@@ -91,6 +99,7 @@
     "model": "def-mr",
     "name": "M.R.",
     "description": "Fasting, Detoxing",
+    "image": "https://media.istockphoto.com/id/1385373419/vector/intermittent-fasting-concept-man-run-in-clock-waiting-for-time-to-eat-healthy-food-boy.jpg?s=612x612&w=is&k=20&c=ekIJxu5zjbB4w3Z1ipNTFiiHh8IeV8CPnomM1GM3_e0=",
     "bot": "9",
     "route": "/mr",
     "questions": [

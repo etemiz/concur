@@ -198,6 +198,8 @@ export default function MyLayout() {
   }, []);
 
   const sendMessage = async () => {
+    if(message.length === 0 || message.trim().length === 0 || message === "") return;
+
     if (isMessageAFeedbackOfBotsResponse(message)) {
       makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInputField(
         publicKeyMyself,
@@ -281,6 +283,7 @@ export default function MyLayout() {
       description: selectedAIModel?.description,
       questions: selectedAIModel?.questions,
       created_at: Math.floor(Date.now() / 1000),
+      image: selectedAIModel?.image,
     };
   };
 
@@ -376,9 +379,10 @@ export default function MyLayout() {
         <div className="flex items-center">
           <div className="h-[35px] w-[35px]">
             <Image
-              src="/BotPic.png"
+              src={selectedAIModel.image}
               width={35}
               height={35}
+              className="w-full h-full"
               alt="Potrait of an Ostrich"
               style={{ borderRadius: "50%" }}
             />

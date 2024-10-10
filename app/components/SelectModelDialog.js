@@ -44,10 +44,11 @@ export default function SelectModelDialog({
                 >
                   <div className="h-[35px] w-[35px]">
                     <Image
-                      src="/BotPic.png"
+                      src={aiModel.image}
                       width={35}
                       height={35}
                       alt="Portrait of an Ostrich"
+                      className="w-full h-full"
                       style={{ borderRadius: "50%" }}
                     />
                   </div>

@@ -184,6 +184,16 @@ async function makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInpu
     setMessage("");
   } catch (error) {
     setConnectionGotCutOff(true);
+
+    let errorMessages = "";
+    if (error instanceof AggregateError) {
+      error.errors.forEach((err, index) => {
+        errorMessages += `Error ${index + 1}: ${err.message || err}\n`;
+      });
+    } else {
+      errorMessages = error.message || "An unknown error occurred";
+    }
+    alert(`Multiple errors occurred:\n\n${errorMessages}`);
     console.error(error);
   }
 }
@@ -226,6 +236,16 @@ async function makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputF
     setMessage("");
   } catch (error) {
     setConnectionGotCutOff(true);
+
+    let errorMessages = "";
+    if (error instanceof AggregateError) {
+      error.errors.forEach((err, index) => {
+        errorMessages += `Error ${index + 1}: ${err.message || err}\n`;
+      });
+    } else {
+      errorMessages = error.message || "An unknown error occurred";
+    }
+    alert(`Multiple errors occurred:\n\n${errorMessages}`);
     console.error(error);
   }
 }
@@ -274,6 +294,17 @@ const sendARetryMessage = async (
     setMessage("");
   } catch (error) {
     setConnectionGotCutOff(true);
+
+    let errorMessages = "";
+    if (error instanceof AggregateError) {
+      error.errors.forEach((err, index) => {
+        errorMessages += `Error ${index + 1}: ${err.message || err}\n`;
+      });
+    } else {
+      errorMessages = error.message || "An unknown error occurred";
+    }
+
+    alert(`Multiple errors occurred:\n\n${errorMessages}`);
     console.error(error);
   }
 };

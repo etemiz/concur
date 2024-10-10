@@ -55,7 +55,7 @@ const Messages = ({
         if (message?.id === "status-message") {
           return (
             <StatusMessage
-              key={message.id}
+              key={message.id + Math.random()}
               message={message}
               sendDefaultMessageOfAiModel={sendDefaultMessageOfAiModel}
             />
@@ -96,9 +96,9 @@ const MyMessage = ({ message }) => {
         <div className="font-light text-sm px-2 text-gray-600 dark:text-gray-300">
           {"You"}
         </div>
-        <div className="font-light p-3 min-h-12 mt-1 max-w-xl rounded-2xl w-fit min-h-12 bg-gray-300 dark:bg-gray-700 text-black dark:text-gray-100">
+        <pre className="table table-fixed break-words whitespace-pre-wrap font-roboto w-fit  max-w-xl font-light p-3 min-h-12 mt-1 rounded-2xl min-h-12 bg-gray-300 dark:bg-gray-700 text-black dark:text-gray-100">
           {message?.text}
-        </div>
+        </pre>
       </div>
     </div>
   );
@@ -138,15 +138,27 @@ const TheirMessage = ({
     return nameOfAiModelOfMessage;
   };
 
+  const messageAIModelImage = (message) => {
+    let aIModelOfMessage = messageAIModel(message);
+    let imageOfAiModelOfMessage = aiModelsData.find(
+      (model) => model.model === aIModelOfMessage
+    )?.image;
+
+    if (!imageOfAiModelOfMessage) {
+      imageOfAiModelOfMessage = aiModelsData[0].image;
+    }
+
+    return imageOfAiModelOfMessage;
+  };
+
   return (
     <div className="flex my-2">
       <div className="w-[20px] h-[20px] min-w-[20px]">
         <Image
-          className="rounded-full w-[20px] h-[20px]"
-          style={{ width: "20px !important", height: "20px !important" }}
+          className="rounded-full w-[20px] h-[20px] object-cover"
           height={20}
           width={20}
-          src={"/BotPic.png"}
+          src={messageAIModelImage(message)}
           alt={"Bot Picture"}
         />
       </div>
@@ -157,7 +169,7 @@ const TheirMessage = ({
         <div className="flex items-center">
           <div className="flex flex-col items-start relative">
             <div className="font-light p-3 min-h-12 mt-1 max-w-xl rounded-2xl w-fit min-h-12 bg-gray-200 dark:bg-gray-800 text-black dark:text-gray-100 relative">
-              {message?.text}
+              <pre className="whitespace-pre-wrap break-words table w-fit max-w-xl` table-fixed font-roboto">{message?.text}</pre>
               {reaction?.content === "👎" && (
                 <div className="absolute bottom-0 right-0 top-0 left-0 h-full w-full dark:bg-gray-800/[0.8] bg-gray-200/[0.8] rounded-2xl flex justify-around items-center">
                   <div
@@ -210,13 +222,13 @@ const TheirMessage = ({
 const StatusMessage = ({ message, sendDefaultMessageOfAiModel }) => {
   return (
     <div className="w-full flex flex-col items-center mt-6 mt-4">
-      <div className="h-[60px] w-[60px] mt-4">
+      <div className="h-[60px] w-[60px] min-w-[60px]">
         <Image
-          src="/BotPic.png"
-          width={60}
+          className="rounded-full w-[60px] h-[60px] object-cover"
           height={60}
-          alt="Potrait of an Ostrich"
-          style={{ borderRadius: "50%" }}
+          width={60}
+          src={message.image}
+          alt={"Bot Picture"}
         />
       </div>
 
@@ -227,7 +239,7 @@ const StatusMessage = ({ message, sendDefaultMessageOfAiModel }) => {
         {message.questions.map((question, index) => (
           <div
             key={index}
-            className="text-md my-2 self-start w-full text-black dark:text-white p-1 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-start hover:scale-[1.02]"
+            className="text-md cursor-pointer my-2 self-start w-full text-black dark:text-white p-1 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-start hover:scale-[1.02]"
             onClick={() => {
               sendDefaultMessageOfAiModel(question);
             }}
