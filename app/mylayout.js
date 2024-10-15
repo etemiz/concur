@@ -28,6 +28,7 @@ import {
   makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField,
   addTag,
   sendARetryMessage,
+  makeAndPublishAReactionEvent
 } from "./helpers/nip4Helpers";
 import aiModelsData from "../ai-models.json";
 import BrainSvg from "./svgs/BrainSvg";
@@ -87,68 +88,36 @@ export default function MyLayout() {
     setSecretKeyMyself(secretKey);
     setPublicKeyMyself(publicKey);
 
-    subscribingToMultipleRelays(secretKey, publicKey);
+    recieveAndSetMessageHistory(null, secretKey, publicKey);
   }, []);
 
-  const resubscribeToMultipleRelays = async (created_at_time) => {
-    setConnectionGotCutOff(false);
-    const currentTimeInUnixSeconds = created_at_time;
+  const recieveAndSetMessageHistory = (
+    created_at_time,
+    secretKeyParam,
+    publicKeyParam
+  ) => {
+    let secretKey = "";
+    let publicKey = "";
 
+    if (secretKeyParam && publicKeyParam) {
+      secretKey = secretKeyParam;
+      publicKey = publicKeyParam;
+    } else {
+      secretKey = secretKeyMyself;
+      publicKey = publicKeyMyself;
+    }
+
+    setConnectionGotCutOff(false);
     relayPool?.close();
 
-    let h = pool.subscribeMany(
-      listOfRelays,
-      [
-        {
-          kinds: [4],
-          authors: [pk_other, publicKeyMyself],
-        },
-      ],
-      {
-        async onevent(event) {
-          if (event.created_at < currentTimeInUnixSeconds) return;
+    let currentTimeInUnixSeconds;
 
-          if (event.kind == 7) {
-            if (event.pubkey === publicKey && event.tags[0][1] === pk_other) {
-              handleReactionForAMessageRecieved(event, setReactionsOfMessages);
-            }
+    if (created_at_time) {
+      currentTimeInUnixSeconds = created_at_time;
+    } else {
+      currentTimeInUnixSeconds = null;
+    }
 
-            return;
-          }
-
-          if (
-            event.pubkey === pk_other &&
-            event.tags[0][1] === publicKeyMyself
-          ) {
-            decryptAndAddBotMessageToMessageHistory(
-              event,
-              secretKeyMyself,
-              pk_other,
-              sorted,
-              setMessageHistory
-            );
-          }
-          if (
-            event.pubkey === publicKeyMyself &&
-            event.tags[0][1] === pk_other
-          ) {
-            decryptAndAddMyMessageToMessageHistory(
-              event,
-              secretKeyMyself,
-              pk_other,
-              sorted,
-              setMessageHistory
-            );
-          }
-        },
-        async oneose() {},
-      }
-    );
-
-    setRelayPool(h);
-  };
-
-  const subscribingToMultipleRelays = async (secretKey, publicKey) => {
     let h = pool.subscribeMany(
       listOfRelays,
       [
@@ -159,6 +128,14 @@ export default function MyLayout() {
       ],
       {
         async onevent(event) {
+          // console.log("event", event);
+
+          if (
+            currentTimeInUnixSeconds &&
+            event.created_at < currentTimeInUnixSeconds
+          )
+            return;
+
           if (event.kind == 7) {
             if (event.pubkey === publicKey && event.tags[0][1] === pk_other) {
               handleReactionForAMessageRecieved(event, setReactionsOfMessages);
@@ -198,7 +175,8 @@ export default function MyLayout() {
   }, []);
 
   const sendMessage = async () => {
-    if(message.length === 0 || message.trim().length === 0 || message === "") return;
+    if (message.length === 0 || message.trim().length === 0 || message === "")
+      return;
 
     if (isMessageAFeedbackOfBotsResponse(message)) {
       makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInputField(
@@ -208,7 +186,7 @@ export default function MyLayout() {
         message,
         feedbackForMessage,
         connectionGotCutOff,
-        resubscribeToMultipleRelays,
+        recieveAndSetMessageHistory,
         pool,
         listOfRelays,
         setMessage,
@@ -221,7 +199,7 @@ export default function MyLayout() {
         pk_other,
         message,
         connectionGotCutOff,
-        resubscribeToMultipleRelays,
+        recieveAndSetMessageHistory,
         pool,
         listOfRelays,
         setMessage,
@@ -239,7 +217,7 @@ export default function MyLayout() {
       pk_other,
       message,
       connectionGotCutOff,
-      resubscribeToMultipleRelays,
+      recieveAndSetMessageHistory,
       pool,
       listOfRelays,
       setMessage,
@@ -288,36 +266,18 @@ export default function MyLayout() {
   };
 
   const handleReactionOnMessage = async (reaction) => {
-    try {
-      let created_at_time = Math.floor(Date.now() / 1000);
-      let eventTemplate = {
-        pubkey: publicKeyMyself,
-        created_at: created_at_time,
-        kind: 7,
-        tags: [],
-        content: reaction,
-      };
-
-      eventTemplate = addTag(eventTemplate, "p", pk_other);
-      eventTemplate = addTag(
-        eventTemplate,
-        "e",
-        addReactionDialogOpenForMessage?.id
-      );
-
-      const signedEvent = finalizeEvent(
-        eventTemplate,
-        hexToBytes(secretKeyMyself)
-      );
-
-      await Promise.any(pool.publish(listOfRelays, signedEvent));
-
-      // setInputValueForFeedbackIfMessageIsDisliked(reaction);
-
-      if (connectionGotCutOff) resubscribeToMultipleRelays(created_at_time);
-    } catch (error) {
-      setConnectionGotCutOff(true);
-    }
+    makeAndPublishAReactionEvent(
+      reaction,
+      publicKeyMyself,
+      pk_other,
+      addReactionDialogOpenForMessage,
+      secretKeyMyself,
+      pool,
+      listOfRelays,
+      connectionGotCutOff,
+      recieveAndSetMessageHistory,
+      setConnectionGotCutOff
+    )
   };
 
   const setInputValueForFeedbackIfDislikedMessageIsEdited = (message) => {
@@ -339,7 +299,7 @@ export default function MyLayout() {
       pk_other,
       selectedMessage?.id,
       connectionGotCutOff,
-      resubscribeToMultipleRelays,
+      recieveAndSetMessageHistory,
       pool,
       listOfRelays,
       setMessage,

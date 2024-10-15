@@ -148,7 +148,7 @@ async function makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInpu
   message,
   addReactionDialogOpenForMessage,
   connectionGotCutOff,
-  resubscribeToMultipleRelays,
+  recieveAndSetMessageHistory,
   pool,
   listOfRelays,
   setMessage,
@@ -177,7 +177,7 @@ async function makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInpu
       hexToBytes(secretKeyMyself)
     );
 
-    if (connectionGotCutOff) resubscribeToMultipleRelays(created_at_time);
+    if (connectionGotCutOff) recieveAndSetMessageHistory(created_at_time);
 
     await Promise.any(pool.publish(listOfRelays, signedEvent));
 
@@ -204,7 +204,7 @@ async function makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputF
   pk_other,
   message,
   connectionGotCutOff,
-  resubscribeToMultipleRelays,
+  recieveAndSetMessageHistory,
   pool,
   listOfRelays,
   setMessage,
@@ -229,7 +229,7 @@ async function makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputF
       hexToBytes(secretKeyMyself)
     );
 
-    if (connectionGotCutOff) resubscribeToMultipleRelays(created_at_time);
+    if (connectionGotCutOff) recieveAndSetMessageHistory(created_at_time);
 
     await Promise.any(pool.publish(listOfRelays, signedEvent));
 
@@ -263,7 +263,7 @@ const sendARetryMessage = async (
   pk_other,
   referencedMessageId,
   connectionGotCutOff,
-  resubscribeToMultipleRelays,
+  recieveAndSetMessageHistory,
   pool,
   listOfRelays,
   setMessage,
@@ -287,7 +287,7 @@ const sendARetryMessage = async (
       hexToBytes(secretKeyMyself)
     );
 
-    if (connectionGotCutOff) resubscribeToMultipleRelays(created_at_time);
+    if (connectionGotCutOff) recieveAndSetMessageHistory(created_at_time);
 
     await Promise.any(pool.publish(listOfRelays, signedEvent));
 
@@ -309,6 +309,49 @@ const sendARetryMessage = async (
   }
 };
 
+const makeAndPublishAReactionEvent = async (
+  reaction,
+  publicKeyMyself,
+  pk_other,
+  addReactionDialogOpenForMessage,
+  secretKeyMyself,
+  pool,
+  listOfRelays,
+  connectionGotCutOff,
+  recieveAndSetMessageHistory,
+  setConnectionGotCutOff
+) => {
+  try {
+    let created_at_time = Math.floor(Date.now() / 1000);
+    let eventTemplate = {
+      pubkey: publicKeyMyself,
+      created_at: created_at_time,
+      kind: 7,
+      tags: [],
+      content: reaction,
+    };
+
+    eventTemplate = addTag(eventTemplate, "p", pk_other);
+    eventTemplate = addTag(
+      eventTemplate,
+      "e",
+      addReactionDialogOpenForMessage?.id
+    );
+
+    const signedEvent = finalizeEvent(
+      eventTemplate,
+      hexToBytes(secretKeyMyself)
+    );
+
+    const res = await Promise.any(pool.publish(listOfRelays, signedEvent));
+
+    if (connectionGotCutOff) recieveAndSetMessageHistory(created_at_time);
+  } catch (error) {
+    console.log(error)
+    setConnectionGotCutOff(true);
+  }
+};
+
 export {
   encrypt,
   decrypt,
@@ -322,4 +365,5 @@ export {
   makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField,
   addTag,
   sendARetryMessage,
+  makeAndPublishAReactionEvent,
 };
