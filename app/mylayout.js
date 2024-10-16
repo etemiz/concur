@@ -28,7 +28,9 @@ import {
   makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField,
   addTag,
   sendARetryMessage,
-  makeAndPublishAReactionEvent
+  makeAndPublishAReactionEvent,
+  isAThinkingMessageFromABot,
+  handleThinkingMessageFromABot
 } from "./helpers/nip4Helpers";
 import aiModelsData from "../ai-models.json";
 import BrainSvg from "./svgs/BrainSvg";
@@ -137,6 +139,10 @@ export default function MyLayout() {
             return;
 
           if (event.kind == 7) {
+            if(isAThinkingMessageFromABot(event, publicKey, pk_other)){
+              handleThinkingMessageFromABot(sorted, event, setMessageHistory);
+            }
+
             if (event.pubkey === publicKey && event.tags[0][1] === pk_other) {
               handleReactionForAMessageRecieved(event, setReactionsOfMessages);
             }
@@ -207,7 +213,6 @@ export default function MyLayout() {
         selectedAIModel
       );
     }
-    incrementBrainIconInHeaderIfLearningRequested(message);
   };
 
   const sendDefaultMessageOfAiModel = (message) => {
@@ -224,20 +229,6 @@ export default function MyLayout() {
       setConnectionGotCutOff,
       selectedAIModel
     );
-  };
-
-  const incrementBrainIconInHeaderIfLearningRequested = (message) => {
-    const pattern = /learn this:/i;
-
-    if (pattern.test(message)) {
-      setNumberOfHeaderBrainIcons((prev) => {
-        if (prev === 3) {
-          return prev;
-        }
-
-        return prev + 1;
-      });
-    }
   };
 
   const handleKeyDown = (event) => {
@@ -262,6 +253,8 @@ export default function MyLayout() {
       questions: selectedAIModel?.questions,
       created_at: Math.floor(Date.now() / 1000),
       image: selectedAIModel?.image,
+      isAThinkingMessageFromABot: false,
+      isReferencingTheMessage: "",
     };
   };
 
@@ -284,12 +277,16 @@ export default function MyLayout() {
     setMessage(`Preferred answer: ${message?.text}`);
   };
 
-  useEffect(() => {
+  const scrollToBottomOfMessageHistoryList = () => {
     if (bottomOfMessageHistoryList.current) {
       bottomOfMessageHistoryList.current?.scrollIntoView({
         behavior: "smooth",
       });
     }
+  }
+
+  useEffect(() => {
+    scrollToBottomOfMessageHistoryList();
   }, [messageHistory]);
 
   const retryAMessage = async (selectedMessage) => {
@@ -303,7 +300,8 @@ export default function MyLayout() {
       pool,
       listOfRelays,
       setMessage,
-      setConnectionGotCutOff
+      setConnectionGotCutOff,
+      selectedAIModel
     );
   };
 
@@ -392,6 +390,9 @@ export default function MyLayout() {
           setFeedbackForMessage={setFeedbackForMessage}
           bottomOfMessageHistoryList={bottomOfMessageHistoryList}
           retryAMessage={retryAMessage}
+          numberOfHeaderBrainIcons={numberOfHeaderBrainIcons}
+          setNumberOfHeaderBrainIcons={setNumberOfHeaderBrainIcons}
+          selectedAIModel={selectedAIModel}
         />
       }
 

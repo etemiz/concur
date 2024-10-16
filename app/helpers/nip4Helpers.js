@@ -90,15 +90,28 @@ async function decryptAndAddBotMessageToMessageHistory(
   sorted,
   setMessageHistory
 ) {
+  const referencingMessageId = event.tags[1][1];
+
   const newMessageText = await decrypt(secretKey, pk_other, event.content);
 
   const res = sorted.insert({
     ...event,
     text: newMessageText,
     isUser: false,
+    isAThinkingMessageFromABot: false,
+    isReferencingTheMessage: referencingMessageId,
   });
 
-  setMessageHistory([...res.array]);
+  removeThinkingMessageFromHistoryIfBotReponseAndThinkingMessageAreReferencingSameUserMessage(referencingMessageId, setMessageHistory, sorted )
+}
+
+const removeThinkingMessageFromHistoryIfBotReponseAndThinkingMessageAreReferencingSameUserMessage = (referencingMessageId, setMessageHistory, sorted) => {
+  const index = sorted.array.findIndex(obj => (obj.isReferencingTheMessage === referencingMessageId && obj.isAThinkingMessageFromABot));
+
+  if (index !== -1) {
+    sorted.array.splice(index, 1);
+  }
+  setMessageHistory([...sorted.array]);
 }
 
 async function decryptAndAddMyMessageToMessageHistory(
@@ -109,7 +122,7 @@ async function decryptAndAddMyMessageToMessageHistory(
   setMessageHistory
 ) {
   const newMessageText = await decrypt(secretKey, pk_other, event.content);
-  const res = sorted.insert({ ...event, text: newMessageText, isUser: true });
+  const res = sorted.insert({ ...event, text: newMessageText, isUser: true, isAThinkingMessageFromABot: false, isReferencingTheMessage: "" });
 
   setMessageHistory([...res.array]);
 }
@@ -267,7 +280,8 @@ const sendARetryMessage = async (
   pool,
   listOfRelays,
   setMessage,
-  setConnectionGotCutOff
+  setConnectionGotCutOff,
+  selectedAIModel
 ) => {
   try {
     let created_at_time = Math.floor(Date.now() / 1000);
@@ -281,6 +295,7 @@ const sendARetryMessage = async (
 
     eventTemplate = addTag(eventTemplate, "p", pk_other);
     eventTemplate = addTag(eventTemplate, "e", referencedMessageId);
+    eventTemplate = addTag(eventTemplate, "model", selectedAIModel?.model);
 
     const signedEvent = finalizeEvent(
       eventTemplate,
@@ -352,6 +367,45 @@ const makeAndPublishAReactionEvent = async (
   }
 };
 
+const handleThinkingMessageFromABot = (sorted, event, setMessageHistory) => {
+  const messageIdAboutWhichBotIsThinking = event.tags[0][1]
+  const newMessageText = event.content
+
+  if(messageAlreadyThought(messageIdAboutWhichBotIsThinking, sorted)){
+    return
+  }
+
+  const res = sorted.insert({
+    ...event,
+    text: newMessageText,
+    isUser: false,
+    isAThinkingMessageFromABot: true,
+    isReferencingTheMessage: messageIdAboutWhichBotIsThinking,
+  });
+
+  setMessageHistory([...res.array]);
+}
+
+const messageAlreadyThought = (messageIdAboutWhichBotIsThinking, sorted) => {
+  const index = sorted.array.findIndex(obj => (obj.isReferencingTheMessage === messageIdAboutWhichBotIsThinking && obj.isAThinkingMessageFromABot === false));
+  
+  if(index !== -1){
+    return true
+  }
+  else {
+    return false
+  }
+}
+
+const isAThinkingMessageFromABot = (event, publicKey, pk_other) => {
+  if(event.pubkey === pk_other && event.tags[1][1] === publicKey && event.content === "🤔"){
+    return true
+  }
+  else {
+    return false
+  }
+}
+
 export {
   encrypt,
   decrypt,
@@ -366,4 +420,6 @@ export {
   addTag,
   sendARetryMessage,
   makeAndPublishAReactionEvent,
+  isAThinkingMessageFromABot,
+  handleThinkingMessageFromABot
 };

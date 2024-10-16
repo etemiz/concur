@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import aiModelsData from "../../ai-models.json";
 import AddReaction from "../svgs/AddReaction";
@@ -6,38 +6,7 @@ import AddReactionDialog from "./AddReactionDialog";
 import PencilSvg from "../svgs/PencilSvg";
 import RoundArrowsSvg from "../svgs/RoundArrowsSvg";
 import Markdown from "react-markdown";
-
-const Message = ({
-  message,
-  setAddReactionDialogOpenForMessage,
-  setIsAddReactionDialogOpen,
-  reaction,
-  sendDefaultMessageOfAiModel,
-}) => {
-  if (message?.id === "status-message") {
-    return (
-      <StatusMessage
-        message={message}
-        sendDefaultMessageOfAiModel={sendDefaultMessageOfAiModel}
-      />
-    );
-  } else {
-    if (message?.isUser) {
-      return <MyMessage message={message} />;
-    } else {
-      return (
-        <TheirMessage
-          message={message}
-          setAddReactionDialogOpenForMessage={
-            setAddReactionDialogOpenForMessage
-          }
-          setIsAddReactionDialogOpen={setIsAddReactionDialogOpen}
-          reaction={reaction}
-        />
-      );
-    }
-  }
-};
+import BrainSvg from "../svgs/BrainSvg";
 
 const Messages = ({
   messageHistory,
@@ -49,6 +18,9 @@ const Messages = ({
   setFeedbackForMessage,
   bottomOfMessageHistoryList,
   retryAMessage,
+  setNumberOfHeaderBrainIcons,
+  numberOfHeaderBrainIcons,
+  selectedAIModel,
 }) => {
   return (
     <div className="overflow-y-auto flex-grow justify-end text-black dark:text-gray-100 p-4 max-w-3xl mx-auto w-full">
@@ -63,7 +35,14 @@ const Messages = ({
           );
         } else {
           if (message?.isUser) {
-            return <MyMessage message={message} key={message.id} />;
+            return (
+              <MyMessage
+                message={message}
+                key={message.id}
+                setNumberOfHeaderBrainIcons={setNumberOfHeaderBrainIcons}
+                numberOfHeaderBrainIcons={numberOfHeaderBrainIcons}
+              />
+            );
           } else {
             return (
               <TheirMessage
@@ -90,7 +69,34 @@ const Messages = ({
   );
 };
 
-const MyMessage = ({ message }) => {
+const MyMessage = ({
+  message,
+  setNumberOfHeaderBrainIcons,
+  numberOfHeaderBrainIcons,
+}) => {
+  const incrementBrainIconInHeaderIfLearningRequested = () => {
+    setNumberOfHeaderBrainIcons((prev) => {
+      if (prev === 5) {
+        return prev;
+      }
+
+      return prev + 1;
+    });
+  };
+
+  const messageIsALearningRequest = useMemo(() => {
+    const pattern = /learn this:/i;
+    const res = pattern.test(message?.text);
+
+    return res;
+  }, []);
+
+  useEffect(() => {
+    if (messageIsALearningRequest) {
+      incrementBrainIconInHeaderIfLearningRequested();
+    }
+  }, [])
+
   return (
     <div className="flex flex-row-reverse my-2">
       <div className="flex flex-col items-end justify-between">
@@ -100,6 +106,13 @@ const MyMessage = ({ message }) => {
         <pre className="break-words whitespace-pre-wrap font-roboto w-fit max-w-xl font-light p-3 min-h-12 mt-1 rounded-2xl min-h-12 bg-gray-300 dark:bg-gray-700 text-black dark:text-gray-100">
           {message?.text}
         </pre>
+        {messageIsALearningRequest && (
+          <div className="text-lg self-end px-1 border rounded-2xl border-[#F4F4F5] dark:border-[#18181B] -top-2 -left-2 relative bg-gray-100 dark:bg-gray-700">
+            <p className="p-0 m-0">
+              <BrainSvg />
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -152,8 +165,6 @@ const TheirMessage = ({
   setFeedbackForMessage,
   retryAMessage,
 }) => {
-
-
   return (
     <div className="flex my-2">
       <div className="w-[20px] h-[20px] min-w-[20px]">
@@ -172,7 +183,9 @@ const TheirMessage = ({
         <div className="flex items-center">
           <div className="flex flex-col items-start relative">
             <div className="font-light p-3 min-h-12 mt-1 max-w-xl rounded-2xl w-fit min-h-12 bg-gray-200 dark:bg-gray-800 text-black dark:text-gray-100 relative">
-              <Markdown className="whitespace-pre-wrap break-words w-fit max-w-xl font-roboto">{message?.text}</Markdown>
+              <Markdown className="whitespace-pre-wrap break-words w-fit max-w-xl font-roboto">
+                {message?.text}
+              </Markdown>
               {reaction?.content === "👎" && (
                 <div className="absolute bottom-0 right-0 top-0 left-0 h-full w-full dark:bg-gray-800/[0.8] bg-gray-200/[0.8] rounded-2xl flex justify-around items-center">
                   <div
@@ -200,12 +213,12 @@ const TheirMessage = ({
               )}
             </div>
             {reaction?.content && (
-              <div className="text-lg self-end px-1 border-2 rounded-2xl border-[#F4F4F5] dark:border-[#18181B] -top-2 -left-2 relative bg-gray-100 dark:bg-gray-700">
+              <div className="text-lg self-end px-1 border rounded-2xl border-[#F4F4F5] dark:border-[#18181B] -top-2 -left-2 relative bg-gray-100 dark:bg-gray-700">
                 <p className="p-0 m-0">{reaction?.content}</p>
               </div>
             )}
           </div>
-          {!reaction?.content && (
+          {!reaction?.content && !message?.isAThinkingMessageFromABot && (
             <div
               className="ml-2"
               onClick={() => {
@@ -257,76 +270,5 @@ const StatusMessage = ({ message, sendDefaultMessageOfAiModel }) => {
     </div>
   );
 };
-
-const ThinkingMessage = ({
-  message
-}) => {
-  return (
-    <div className="flex my-2">
-      <div className="w-[20px] h-[20px] min-w-[20px]">
-        <Image
-          className="rounded-full w-[20px] h-[20px] object-cover"
-          height={20}
-          width={20}
-          src={messageAIModelImage(message)}
-          alt={"Bot Picture"}
-        />
-      </div>
-      <div className="flex flex-col justify-between">
-        <div className="font-light flex text-sm px-2 text-gray-600 dark:text-gray-300 justify-between items-center">
-          <div>{messageAIModelName(message)}</div>
-        </div>
-        <div className="flex items-center">
-          <div className="flex flex-col items-start relative">
-            <div className="font-light p-3 min-h-12 mt-1 max-w-xl rounded-2xl w-fit min-h-12 bg-gray-200 dark:bg-gray-800 text-black dark:text-gray-100 relative">
-              <Markdown className="whitespace-pre-wrap break-words table w-fit max-w-xl` table-fixed font-roboto">{message?.text}</Markdown>
-              {reaction?.content === "👎" && (
-                <div className="absolute bottom-0 right-0 top-0 left-0 h-full w-full dark:bg-gray-800/[0.8] bg-gray-200/[0.8] rounded-2xl flex justify-around items-center">
-                  <div
-                    className="flex items-center justify-center"
-                    onClick={() => {
-                      setInputValueForFeedbackIfDislikedMessageIsEdited(
-                        message
-                      );
-                      setFeedbackForMessage(message);
-                    }}
-                  >
-                    <PencilSvg />
-                    <div className="ml-2">Edit</div>
-                  </div>
-                  <div
-                    className="flex items-center justify-center"
-                    onClick={() => {
-                      retryAMessage(message);
-                    }}
-                  >
-                    <RoundArrowsSvg />
-                    <div className="ml-2">Retry</div>
-                  </div>
-                </div>
-              )}
-            </div>
-            {reaction?.content && (
-              <div className="text-lg self-end px-1 border-2 rounded-2xl border-[#F4F4F5] dark:border-[#18181B] -top-2 -left-2 relative bg-gray-100 dark:bg-gray-700">
-                <p className="p-0 m-0">{reaction?.content}</p>
-              </div>
-            )}
-          </div>
-          {!reaction?.content && (
-            <div
-              className="ml-2"
-              onClick={() => {
-                setAddReactionDialogOpenForMessage(message);
-                setIsAddReactionDialogOpen(true);
-              }}
-            >
-              <AddReaction />
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default Messages;
