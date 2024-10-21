@@ -85,10 +85,10 @@ const About = () => {
       </div>
       <div className="flex justify-center flex-row-reverse items-center">
         <p className="mx-4 text-xl font-light font-roboto p-4 text-center bg-white/70 dark:bg-black/20 rounded-xl border dark:border-gray-600 max-w-5xl">
-          "Concur is an AI app where you can send your questions to experts.
+          &quot;Concur is an AI app where you can send your questions to experts.
           Each expert has their own AI model and will answer differently. We
           consciously curate sources of wisdom and experts that are aligned with
-          humanity."
+          humanity.&quot;
         </p>
       </div>
       <div className="w-full px-4 mt-10 mb-10">
@@ -102,8 +102,8 @@ const About = () => {
             </Link>
 
             <p className="mx-4 text-xl font-light font-roboto p-4 text-center bg-black/50 dark:bg-white/70 max-w-5xl bg-black text-white dark:text-black dark:bg-white my-3 mb-9 dark:border-gray-600">
-              "Talks about our vision. We love feedback. Please send them using
-              the form below."
+              &quot;Talks about our vision. We love feedback. Please send them using
+              the form below.&quot;
             </p>
 
             <div className="flex flex-col items-start justify-center w-full">
