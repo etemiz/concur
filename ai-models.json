@@ -88,7 +88,7 @@
       "Can crystals heal emotional trauma?",
       "Do herbal extracts have a stronger therapeutic effect than whole herbs?"
     ],
-    "premium": false
+    "premium": true
   },
   {
     "model": "def-jg",
@@ -101,7 +101,7 @@
       "Should pregnant women fast for health benefits?",
       "How can you target fat loss in your abdomen?"
     ],
-    "premium": false
+    "premium": true
   },
   {
     "model": "def-mr",
