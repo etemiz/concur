@@ -83,6 +83,18 @@ function generatedOrSavedClientKeys() {
   }
 }
 
+function generateNewClientKeysAndSaveThem() {
+  let secretKey = generateSecretKey();
+  secretKey = bytesToHex(secretKey);
+  let publicKey = getPublicKey(secretKey);
+  saveKeysToLocalStorage(secretKey, publicKey);
+
+  return {
+    secretKey,
+    publicKey,
+  };
+}
+
 async function decryptAndAddBotMessageToMessageHistory(
   event,
   secretKey,
@@ -102,17 +114,26 @@ async function decryptAndAddBotMessageToMessageHistory(
     isReferencingTheMessage: referencingMessageId,
   });
 
-  removeThinkingMessageFromHistoryIfBotReponseAndThinkingMessageAreReferencingSameUserMessage(referencingMessageId, setMessageHistory, sorted )
+  removeThinkingMessageFromHistoryIfBotReponseAndThinkingMessageAreReferencingSameUserMessage(
+    referencingMessageId,
+    setMessageHistory,
+    sorted
+  );
 }
 
-const removeThinkingMessageFromHistoryIfBotReponseAndThinkingMessageAreReferencingSameUserMessage = (referencingMessageId, setMessageHistory, sorted) => {
-  const index = sorted.array.findIndex(obj => (obj.isReferencingTheMessage === referencingMessageId && obj.isAThinkingMessageFromABot));
+const removeThinkingMessageFromHistoryIfBotReponseAndThinkingMessageAreReferencingSameUserMessage =
+  (referencingMessageId, setMessageHistory, sorted) => {
+    const index = sorted.array.findIndex(
+      (obj) =>
+        obj.isReferencingTheMessage === referencingMessageId &&
+        obj.isAThinkingMessageFromABot
+    );
 
-  if (index !== -1) {
-    sorted.array.splice(index, 1);
-  }
-  setMessageHistory([...sorted.array]);
-}
+    if (index !== -1) {
+      sorted.array.splice(index, 1);
+    }
+    setMessageHistory([...sorted.array]);
+  };
 
 async function decryptAndAddMyMessageToMessageHistory(
   event,
@@ -122,7 +143,13 @@ async function decryptAndAddMyMessageToMessageHistory(
   setMessageHistory
 ) {
   const newMessageText = await decrypt(secretKey, pk_other, event.content);
-  const res = sorted.insert({ ...event, text: newMessageText, isUser: true, isAThinkingMessageFromABot: false, isReferencingTheMessage: "" });
+  const res = sorted.insert({
+    ...event,
+    text: newMessageText,
+    isUser: true,
+    isAThinkingMessageFromABot: false,
+    isReferencingTheMessage: "",
+  });
 
   setMessageHistory([...res.array]);
 }
@@ -362,17 +389,17 @@ const makeAndPublishAReactionEvent = async (
 
     if (connectionGotCutOff) recieveAndSetMessageHistory(created_at_time);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     setConnectionGotCutOff(true);
   }
 };
 
 const handleThinkingMessageFromABot = (sorted, event, setMessageHistory) => {
-  const messageIdAboutWhichBotIsThinking = event.tags[0][1]
-  const newMessageText = event.content
+  const messageIdAboutWhichBotIsThinking = event.tags[0][1];
+  const newMessageText = event.content;
 
-  if(messageAlreadyThought(messageIdAboutWhichBotIsThinking, sorted)){
-    return
+  if (messageAlreadyThought(messageIdAboutWhichBotIsThinking, sorted)) {
+    return;
   }
 
   const res = sorted.insert({
@@ -384,27 +411,33 @@ const handleThinkingMessageFromABot = (sorted, event, setMessageHistory) => {
   });
 
   setMessageHistory([...res.array]);
-}
+};
 
 const messageAlreadyThought = (messageIdAboutWhichBotIsThinking, sorted) => {
-  const index = sorted.array.findIndex(obj => (obj.isReferencingTheMessage === messageIdAboutWhichBotIsThinking && obj.isAThinkingMessageFromABot === false));
-  
-  if(index !== -1){
-    return true
+  const index = sorted.array.findIndex(
+    (obj) =>
+      obj.isReferencingTheMessage === messageIdAboutWhichBotIsThinking &&
+      obj.isAThinkingMessageFromABot === false
+  );
+
+  if (index !== -1) {
+    return true;
+  } else {
+    return false;
   }
-  else {
-    return false
-  }
-}
+};
 
 const isAThinkingMessageFromABot = (event, publicKey, pk_other) => {
-  if(event.pubkey === pk_other && event.tags[1][1] === publicKey && event.content === "🤔"){
-    return true
+  if (
+    event.pubkey === pk_other &&
+    event.tags[1][1] === publicKey &&
+    event.content === "🤔"
+  ) {
+    return true;
+  } else {
+    return false;
   }
-  else {
-    return false
-  }
-}
+};
 
 export {
   encrypt,
@@ -421,5 +454,6 @@ export {
   sendARetryMessage,
   makeAndPublishAReactionEvent,
   isAThinkingMessageFromABot,
-  handleThinkingMessageFromABot
+  handleThinkingMessageFromABot,
+  generateNewClientKeysAndSaveThem,
 };

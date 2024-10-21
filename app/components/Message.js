@@ -189,7 +189,7 @@ const TheirMessage = ({
               {reaction?.content === "👎" && (
                 <div className="absolute bottom-0 right-0 top-0 left-0 h-full w-full dark:bg-gray-800/[0.8] bg-gray-200/[0.8] rounded-2xl flex justify-around items-center">
                   <div
-                    className="flex items-center justify-center"
+                    className="flex items-center justify-center cursor-pointer"
                     onClick={() => {
                       setInputValueForFeedbackIfDislikedMessageIsEdited(
                         message
@@ -201,7 +201,7 @@ const TheirMessage = ({
                     <div className="ml-2">Edit</div>
                   </div>
                   <div
-                    className="flex items-center justify-center"
+                    className="flex items-center justify-center cursor-pointer"
                     onClick={() => {
                       retryAMessage(message);
                     }}
