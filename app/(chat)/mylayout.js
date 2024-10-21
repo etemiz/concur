@@ -45,7 +45,7 @@ export default function MyLayout() {
     return dataArray.some(item => item.route === value);
   }
 
-  if(!routeExists('/' + params.slug, aiModelsData)) {
+  if(params.slug && !routeExists('/' + params.slug, aiModelsData)) {
     redirect(`/not-found`)
   }
   
