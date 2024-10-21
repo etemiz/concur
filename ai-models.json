@@ -9,7 +9,8 @@
     "questions": [
       "Can prolonged fasting lead to permanent loss of muscle mass?",
       "Is there a link between heavy metals in the environment and health problems?"
-    ]
+    ],
+    "premium": false
   },
   {
     "model": "def-kc",
@@ -20,8 +21,9 @@
     "route": "/kc",
     "questions": [
       "Is there a connection between red meat and heart disease?",
-      "Is the study of phytochemicals a promising area of research?"
-    ]
+      "Is the s,tudy of phytochemicals a promising area of research?"
+    ],
+    "premium": true
   },
   {
     "model": "def-jn",
@@ -33,7 +35,8 @@
     "questions": [
       "Can mindfulness meditation improve chronic pain?",
       "Is a flexitarian diet the most sustainable option?"
-    ]
+    ],
+    "premium": false
   },
   {
     "model": "def-dc",
@@ -45,7 +48,8 @@
     "questions": [
       "Are mandatory vaccines a violation of personal freedom?",
       "Is the use of antibiotics in livestock production necessary and safe, or is it contributing to the rise of antibiotic-resistant bacteria?"
-    ]
+    ],
+    "premium": true
   },
   {
     "model": "def-ec",
@@ -57,7 +61,8 @@
     "questions": [
       "Is intermittent fasting safe?",
       "Are low-fat diets really healthier than high-fat diets, or has this belief been based on flawed science?"
-    ]
+    ],
+    "premium": true
   },
   {
     "model": "def-ce",
@@ -69,7 +74,8 @@
     "questions": [
       "Is permaculture a more cost-effective way to produce food?",
       "Does the consumption of alkaline water improve health?"
-    ]
+    ],
+    "premium": false
   },
   {
     "model": "def-sf",
@@ -81,7 +87,8 @@
     "questions": [
       "Can crystals heal emotional trauma?",
       "Do herbal extracts have a stronger therapeutic effect than whole herbs?"
-    ]
+    ],
+    "premium": false
   },
   {
     "model": "def-jg",
@@ -93,7 +100,8 @@
     "questions": [
       "Should pregnant women fast for health benefits?",
       "How can you target fat loss in your abdomen?"
-    ]
+    ],
+    "premium": false
   },
   {
     "model": "def-mr",
@@ -105,6 +113,7 @@
     "questions": [
       "Are detox foot pads a scam?",
       "Can juice fasts detoxify the body?"
-    ]
+    ],
+    "premium": false
   }
 ]

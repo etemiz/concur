@@ -30,6 +30,7 @@ import AddReactionDialog from "../components/AddReactionDialog";
 import AboutIcon from "../svgs/AboutIcon";
 import AddIcon from "../svgs/AddIcon";
 import Link from "next/link";
+import { useParams, redirect } from 'next/navigation'
 
 let pk_other =
   "npub1chadadwep45t4l7xx9z45p72xsxv7833zyy4tctdgh44lpc50nvsrjex2m";
@@ -37,7 +38,17 @@ let pk_other =
 pk_other = convertNostrPublicKeyToHex(pk_other);
 var sorted = new SortedArray([], (a, b) => a.created_at - b.created_at);
 
-export default function MyLayout() {
+export default function MyLayout() {  
+  const params = useParams()
+
+  function routeExists(value, dataArray) {
+    return dataArray.some(item => item.route === value);
+  }
+
+  if(!routeExists('/' + params.slug, aiModelsData)) {
+    redirect(`/not-found`)
+  }
+  
   const pool = new SimplePool();
 
   const selectedAIModelBasedOnPath = () => {
@@ -121,8 +132,6 @@ export default function MyLayout() {
       ],
       {
         async onevent(event) {
-          console.log("event", event);
-
           if (
             currentTimeInUnixSeconds &&
             event.created_at < currentTimeInUnixSeconds

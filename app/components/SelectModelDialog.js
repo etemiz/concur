@@ -42,14 +42,23 @@ export default function SelectModelDialog({
                     window.history.pushState(null, "", aiModel.route);
                   }}
                 >
-                  <div className="h-[35px] w-[35px]">
-                    <Image
+                  {aiModel?.premium ? (
+                    <div className="h-[35px] w-[35px] flex items-center justify-center mr-1">
+                      <img
+                        src={"/goldenBrain.png"}
+                        alt="Golden Brain"
+                        className="h-6"
+                        style={{ borderRadius: "50%" }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-[35px] w-[35px] flex items-center justify-center mr-1"></div>
+                  )}
+                  <div class="w-[35px] h-[35px] overflow-hidden rounded-full">
+                    <img
                       src={aiModel.image}
-                      width={35}
-                      height={35}
-                      alt="Portrait of an Ostrich"
-                      className="w-full h-full"
-                      style={{ borderRadius: "50%" }}
+                      alt="Sample Image"
+                      class="object-cover w-full h-full"
                     />
                   </div>
 
