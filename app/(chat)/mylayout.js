@@ -30,7 +30,7 @@ import AddReactionDialog from "../components/AddReactionDialog";
 import AboutIcon from "../svgs/AboutIcon";
 import AddIcon from "../svgs/AddIcon";
 import Link from "next/link";
-import { useParams, redirect } from 'next/navigation'
+import { useParams, redirect } from "next/navigation";
 
 let pk_other =
   "npub1chadadwep45t4l7xx9z45p72xsxv7833zyy4tctdgh44lpc50nvsrjex2m";
@@ -38,18 +38,18 @@ let pk_other =
 pk_other = convertNostrPublicKeyToHex(pk_other);
 var sorted = new SortedArray([], (a, b) => a.created_at - b.created_at);
 
-export default function MyLayout() {  
-  const params = useParams()
+export default function MyLayout() {
+  const params = useParams();
 
   function routeExists(value, dataArray) {
-    return dataArray.some(item => item.route === value);
+    return dataArray.some((item) => item.route === value);
   }
 
-  if(params.slug && !routeExists('/' + params.slug, aiModelsData)) {
-    redirect(`/not-found`)
+  if (params.slug && !routeExists("/" + params.slug, aiModelsData)) {
+    redirect(`/not-found`);
   }
-  
-  const pool = new SimplePool();
+
+  let pool = new SimplePool();
 
   const selectedAIModelBasedOnPath = () => {
     let modelAccordingToPath = aiModelsData[0];
@@ -170,17 +170,51 @@ export default function MyLayout() {
           }
         },
         async oneose() {},
+        onclose(reason) {
+          console.log("relay got diconnected");
+          console.log(reason);
+        },
       }
     );
 
     setRelayPool(h);
   };
 
+  function checkLastRunAndExecute() {
+    const lastRunKey = "lastRunTime";
+
+    const currentTime = new Date();
+
+    const lastRunTime = localStorage.getItem(lastRunKey)
+      ? new Date(localStorage.getItem(lastRunKey))
+      : null;
+
+    // If there's no last run time, or it's been more than 2 minutes, run the code
+    if (!lastRunTime || currentTime - lastRunTime > 2 * 60 * 1000) {
+      console.log(
+        "More than 2 minutes have passed or it's the first run. Running code..."
+      );
+
+      pool = new SimplePool();
+      recieveAndSetMessageHistory(
+        Math.floor(Date.now() / 1000),
+        secretKeyMyself,
+        publicKeyMyself
+      );
+
+      localStorage.setItem(lastRunKey, currentTime.toISOString());
+    } else {
+      console.log("Less than 2 minutes since the last run. No action taken.");
+    }
+  }
+
   useEffect(() => {
     return () => relayPool?.close();
   }, []);
 
   const sendMessage = async () => {
+    checkLastRunAndExecute()
+
     if (message.length === 0 || message.trim().length === 0 || message === "")
       return;
 
@@ -216,6 +250,8 @@ export default function MyLayout() {
   };
 
   const sendDefaultMessageOfAiModel = (message) => {
+    checkLastRunAndExecute()
+
     makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField(
       publicKeyMyself,
       secretKeyMyself,
@@ -259,6 +295,8 @@ export default function MyLayout() {
   };
 
   const handleReactionOnMessage = async (reaction) => {
+    checkLastRunAndExecute();
+
     makeAndPublishAReactionEvent(
       reaction,
       publicKeyMyself,
@@ -290,6 +328,8 @@ export default function MyLayout() {
   }, [messageHistory]);
 
   const retryAMessage = async (selectedMessage) => {
+    checkLastRunAndExecute()
+
     sendARetryMessage(
       publicKeyMyself,
       secretKeyMyself,
@@ -306,6 +346,8 @@ export default function MyLayout() {
   };
 
   const handleNewChatIconClick = () => {
+    checkLastRunAndExecute()
+
     let { secretKey, publicKey } = generateNewClientKeysAndSaveThem();
 
     setSecretKeyMyself(secretKey);
@@ -313,7 +355,7 @@ export default function MyLayout() {
     sorted.array = [selectedAIModelStatusMessage()];
     setMessageHistory([selectedAIModelStatusMessage()]);
     recieveAndSetMessageHistory(null, secretKey, publicKey);
-  }
+  };
 
   return (
     <div className="font-roboto h-[100dvh] max-h-[100dvh] flex flex-col justify-between bg-white dark:bg-gray-900">
@@ -385,10 +427,16 @@ export default function MyLayout() {
           )}
         </div>
         <div className="h-full flex items-center justify-end">
-          <Link href={'/about'} className="p-2 pl-0 my-1 rounded-full transition-colors duration-200 cursor-pointer">
+          <Link
+            href={"/about"}
+            className="p-2 pl-0 my-1 rounded-full transition-colors duration-200 cursor-pointer"
+          >
             <AboutIcon />
           </Link>
-          <div onClick={handleNewChatIconClick} className="p-2 my-1 mr-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-pointer">
+          <div
+            onClick={handleNewChatIconClick}
+            className="p-2 my-1 mr-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-pointer"
+          >
             <AddIcon />
           </div>
         </div>
