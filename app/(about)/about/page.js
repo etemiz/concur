@@ -30,13 +30,17 @@ const About = () => {
   }, []);
 
   const sendMessage = async () => {
+    if (!message) {
+      return;
+    }
+
     let created_at_time = Math.floor(Date.now() / 1000);
     let eventTemplate = {
       pubkey: publicKeyMyself,
       created_at: created_at_time,
       kind: 4,
       tags: [],
-      content: await encrypt(secretKeyMyself, pk_other, message),
+      content: await encrypt(secretKeyMyself, pk_other, messageContent()),
     };
 
     eventTemplate = addTag(eventTemplate, "p", pk_other);
@@ -51,6 +55,17 @@ const About = () => {
     setMessage("");
     setEmail("");
   };
+
+  const messageContent = () => {
+    let s;
+    if(message) {
+      s = message;
+    }
+    if(email) {
+      s = `${s} Email: ${email}`;
+    }
+    return s;
+  }
 
   return (
     <div className="w-full px-4">
@@ -84,14 +99,14 @@ const About = () => {
         <div className="h-[25px] w-[25px]"></div>
       </div>
       <div className="flex justify-center flex-row-reverse items-center">
-        <p className="mx-4 text-xl font-light font-roboto p-4 text-center bg-white/70 dark:bg-black/20 rounded-xl border dark:border-gray-600 max-w-5xl">
-          &quot;Concur is an AI app where you can send your questions to experts.
-          Each expert has their own AI model and will answer differently. We
-          consciously curate sources of wisdom and experts that are aligned with
-          humanity.&quot;
+        <p className="text-xl font-light font-roboto p-4 text-center bg-white/70 dark:bg-black/20 rounded-xl border dark:border-gray-600 max-w-5xl">
+          &quot;Concur is an AI app where you can send your questions to
+          experts. Each expert has their own AI model and will answer
+          differently. We consciously curate sources of wisdom and experts that
+          are aligned with humanity.&quot;
         </p>
       </div>
-      <div className="w-full px-4 mt-10 mb-10">
+      <div className="w-full mt-10 mb-10">
         <div className="mx-auto max-w-5xl mx-4">
           <div className="font-roboto font-light p-4 flex flex-col justify-center items-center p-4 text-center bg-white/70 dark:bg-black/20 rounded-xl border w-full dark:border-gray-600">
             <Link
@@ -102,8 +117,18 @@ const About = () => {
             </Link>
 
             <p className="mx-4 text-xl font-light font-roboto p-4 text-center bg-black/50 dark:bg-white/70 max-w-5xl bg-black text-white dark:text-black dark:bg-white my-3 mb-9 dark:border-gray-600">
-              &quot;Talks about our vision. We love feedback. Please send them using
-              the form below.&quot;
+              &quot;Talks about our vision.&quot;
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="w-full mt-10 mb-10">
+        <div className="mx-auto max-w-5xl">
+          <div className="font-roboto font-light p-4 flex flex-col justify-center items-center p-4 text-center bg-white/70 dark:bg-black/20 rounded-xl border w-full dark:border-gray-600">
+            <p className="font-light font-roboto text-xl py-4 text-center max-w-5xl my-3 mb-9">
+              <span className="font-extrabold">&quot;</span>We love feedback.
+              Please send them using the form below.
+              <span className="font-extrabold">&quot;</span>
             </p>
 
             <div className="flex flex-col items-start justify-center w-full">

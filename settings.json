@@ -3,6 +3,7 @@
     "wss://nostr.mom",
     "wss://relay.primal.net",
     "wss://relay.nos.social",
-    "wss://relay.nostr.band"
+    "wss://relay.nostr.band",
+    "wss://nos.lol"
   ]
 }
