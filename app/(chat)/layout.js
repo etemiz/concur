@@ -21,8 +21,8 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "Conscious Curations",
-  description: "Conscious Curations",
+  title: "Pick A Brain",
+  description: "Pick A Brain",
 };
 
 export default function RootLayout({ children }) {

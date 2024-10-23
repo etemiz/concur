@@ -8,12 +8,14 @@ import {
   DialogTitle,
   DialogBackdrop,
 } from "@headlessui/react";
+import { useRouter } from "next/navigation";
 
 export default function SelectModelDialog({
   isSelectModelDialogOpen,
   setIsSelectModelDialogOpen,
   setSelectedAIModel,
 }) {
+  const router = useRouter();
   return (
     <>
       <Dialog
@@ -26,20 +28,24 @@ export default function SelectModelDialog({
           transition
           className="fixed dark:bg-white/30 bg-gray-800 inset-0 bg-gray-500 bg-opacity-75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
         />
-        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4">
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto flex items-center justify-center">
+          <div className="flex h-[80vh] items-center justify-center p-4 py-16">
             <DialogPanel
               transition
-              className="w-full max-w-md rounded-xl bg-white dark:bg-gray-800  p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+              className="w-full max-w-md rounded-xl h-full overflow-y-scroll bg-white dark:bg-gray-800  p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
             >
               {data.map((aiModel) => (
                 <div
                   key={aiModel.name}
                   className="flex items-center p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg"
                   onClick={() => {
-                    setIsSelectModelDialogOpen(false);
-                    setSelectedAIModel(aiModel);
-                    window.history.pushState(null, "", aiModel.route);
+                    if (aiModel?.premium) {
+                      router.push("/payment");
+                    } else {
+                      setIsSelectModelDialogOpen(false);
+                      setSelectedAIModel(aiModel);
+                      window.history.pushState(null, "", aiModel.route);
+                    }
                   }}
                 >
                   {aiModel?.premium ? (
