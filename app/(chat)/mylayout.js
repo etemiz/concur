@@ -37,6 +37,9 @@ let pk_other =
 // pk_other = "622f2238d33cf54d8c6181a3475e69e9556df60bb57cbf157fd1ea06eeda41de";
 pk_other = convertNostrPublicKeyToHex(pk_other);
 var sorted = new SortedArray([], (a, b) => a.created_at - b.created_at);
+let pool = new SimplePool();
+
+const uniqueEvents = new Set();
 
 export default function MyLayout() {
   const params = useParams();
@@ -48,8 +51,6 @@ export default function MyLayout() {
   if (params.slug && !routeExists("/" + params.slug, aiModelsData)) {
     redirect(`/not-found`);
   }
-
-  let pool = new SimplePool();
 
   const selectedAIModelBasedOnPath = () => {
     let modelAccordingToPath = aiModelsData[0];
@@ -112,7 +113,12 @@ export default function MyLayout() {
     }
 
     setConnectionGotCutOff(false);
+
+    console.log("before relayPool.close", pool.listConnectionStatus())
+
     relayPool?.close();
+
+    console.log("before relayPool.close", pool.listConnectionStatus())
 
     let currentTimeInUnixSeconds;
 
@@ -122,7 +128,7 @@ export default function MyLayout() {
       currentTimeInUnixSeconds = null;
     }
 
-    let h = pool.subscribeMany(
+    let h = pool.subscribeMany( 
       listOfRelays,
       [
         {
@@ -132,6 +138,10 @@ export default function MyLayout() {
       ],
       {
         async onevent(event) {
+          if(uniqueEvents.has(event.id)) return
+
+          uniqueEvents.add(event.id)
+
           if (
             currentTimeInUnixSeconds &&
             event.created_at < currentTimeInUnixSeconds
@@ -189,13 +199,14 @@ export default function MyLayout() {
       ? new Date(localStorage.getItem(lastRunKey))
       : null;
 
-    // If there's no last run time, or it's been more than 2 minutes, run the code
     if (!lastRunTime || currentTime - lastRunTime > 2 * 60 * 1000) {
       console.log(
         "More than 2 minutes have passed or it's the first run. Running code..."
       );
+      console.log("before pool.destroy", pool.listConnectionStatus())
+      pool.destroy();
+      console.log("after pool.destroy", pool.listConnectionStatus())
 
-      pool = new SimplePool();
       recieveAndSetMessageHistory(
         Math.floor(Date.now() / 1000),
         secretKeyMyself,
@@ -346,7 +357,7 @@ export default function MyLayout() {
   };
 
   const handleNewChatIconClick = () => {
-    checkLastRunAndExecute()
+    pool.destroy();
 
     let { secretKey, publicKey } = generateNewClientKeysAndSaveThem();
 
