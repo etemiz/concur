@@ -192,7 +192,8 @@ async function makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInpu
   pool,
   listOfRelays,
   setMessage,
-  setConnectionGotCutOff
+  setConnectionGotCutOff,
+  selectedAIModel
 ) {
   try {
     let created_at_time = Math.floor(Date.now() / 1000);
@@ -211,6 +212,7 @@ async function makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInpu
       "e",
       addReactionDialogOpenForMessage?.id
     );
+    eventTemplate = addTag(eventTemplate, "model", selectedAIModel?.model);
 
     const signedEvent = finalizeEvent(
       eventTemplate,

@@ -138,6 +138,8 @@ export default function MyLayout() {
       ],
       {
         async onevent(event) {
+          // console.log(event)
+
           if(uniqueEvents.has(event.id)) return
 
           uniqueEvents.add(event.id)
@@ -241,7 +243,8 @@ export default function MyLayout() {
         pool,
         listOfRelays,
         setMessage,
-        setConnectionGotCutOff
+        setConnectionGotCutOff,
+        selectedAIModel
       );
     } else {
       makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField(
