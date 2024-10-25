@@ -14,6 +14,7 @@ export default function SelectModelDialog({
   isSelectModelDialogOpen,
   setIsSelectModelDialogOpen,
   setSelectedAIModel,
+  premiumUserCookieValue,
 }) {
   const router = useRouter();
   return (
@@ -39,7 +40,7 @@ export default function SelectModelDialog({
                   key={aiModel.name}
                   className="flex items-center p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg"
                   onClick={() => {
-                    if (aiModel?.premium) {
+                    if (aiModel?.premium && !premiumUserCookieValue) {
                       router.push("/payment");
                     } else {
                       setIsSelectModelDialogOpen(false);

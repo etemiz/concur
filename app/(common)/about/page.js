@@ -11,6 +11,8 @@ import { SimplePool } from "nostr-tools/pool";
 import settings from "../../../settings.json";
 import { hexToBytes } from "@noble/hashes/utils";
 import { finalizeEvent } from "nostr-tools/pure";
+import GoldenText from "../../components/GoldenText";
+
 let pk_other =
   "npub1nlk894teh248w2heuu0x8z6jjg2hyxkwdc8cxgrjtm9lnamlskcsghjm9c";
 pk_other = convertNostrPublicKeyToHex(pk_other);
@@ -130,6 +132,10 @@ const About = () => {
               Please send them using the form below.
               <span className="font-extrabold">&quot;</span>
             </p>
+
+            <p className="font-roboto text-start">Detailed feedback and bug submitters will get <span className="font-bold"><GoldenText>Golden Brain badge</GoldenText></span> that will work for a few months and will be able to access more features for free. Be sure to add your email for that.</p>
+
+            <br />
 
             <div className="flex flex-col items-start justify-center w-full">
               <h5 className="font-normal font-roboto text-2xl">

@@ -1,5 +1,5 @@
 "use client";
-import react, { useEffect, useState, useRef } from "react";
+import react, { useEffect, useState, useRef, useMemo } from "react";
 import Image from "next/image";
 import Messages from "../components/Message";
 import TextareaAutosize from "react-textarea-autosize";
@@ -31,6 +31,7 @@ import AboutIcon from "../svgs/AboutIcon";
 import AddIcon from "../svgs/AddIcon";
 import Link from "next/link";
 import { useParams, redirect } from "next/navigation";
+import { getCookieValue } from "../helpers/commonHelper"
 
 let pk_other =
   "npub1chadadwep45t4l7xx9z45p72xsxv7833zyy4tctdgh44lpc50nvsrjex2m";
@@ -42,6 +43,8 @@ let pool = new SimplePool();
 const uniqueEvents = new Set();
 
 export default function MyLayout() {
+  const premiumUserCookieValue = useMemo(() => getCookieValue('gold-ex'), []);
+
   const params = useParams();
 
   function routeExists(value, dataArray) {
@@ -114,11 +117,7 @@ export default function MyLayout() {
 
     setConnectionGotCutOff(false);
 
-    console.log("before relayPool.close", pool.listConnectionStatus())
-
     relayPool?.close();
-
-    console.log("before relayPool.close", pool.listConnectionStatus())
 
     let currentTimeInUnixSeconds;
 
@@ -183,8 +182,8 @@ export default function MyLayout() {
         },
         async oneose() {},
         onclose(reason) {
-          console.log("relay got diconnected");
-          console.log(reason);
+          // console.log("relay got diconnected");
+          // console.log(reason);
         },
       }
     );
@@ -202,12 +201,7 @@ export default function MyLayout() {
       : null;
 
     if (!lastRunTime || currentTime - lastRunTime > 2 * 60 * 1000) {
-      console.log(
-        "More than 2 minutes have passed or it's the first run. Running code..."
-      );
-      console.log("before pool.destroy", pool.listConnectionStatus())
       pool.destroy();
-      console.log("after pool.destroy", pool.listConnectionStatus())
 
       recieveAndSetMessageHistory(
         Math.floor(Date.now() / 1000),
@@ -217,7 +211,6 @@ export default function MyLayout() {
 
       localStorage.setItem(lastRunKey, currentTime.toISOString());
     } else {
-      console.log("Less than 2 minutes since the last run. No action taken.");
     }
   }
 
@@ -244,7 +237,8 @@ export default function MyLayout() {
         listOfRelays,
         setMessage,
         setConnectionGotCutOff,
-        selectedAIModel
+        selectedAIModel,
+        premiumUserCookieValue
       );
     } else {
       makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField(
@@ -258,7 +252,8 @@ export default function MyLayout() {
         listOfRelays,
         setMessage,
         setConnectionGotCutOff,
-        selectedAIModel
+        selectedAIModel,
+        premiumUserCookieValue
       );
     }
   };
@@ -277,7 +272,8 @@ export default function MyLayout() {
       listOfRelays,
       setMessage,
       setConnectionGotCutOff,
-      selectedAIModel
+      selectedAIModel,
+      premiumUserCookieValue
     );
   };
 
@@ -321,7 +317,8 @@ export default function MyLayout() {
       listOfRelays,
       connectionGotCutOff,
       recieveAndSetMessageHistory,
-      setConnectionGotCutOff
+      setConnectionGotCutOff,
+      premiumUserCookieValue
     );
   };
 
@@ -355,7 +352,8 @@ export default function MyLayout() {
       listOfRelays,
       setMessage,
       setConnectionGotCutOff,
-      selectedAIModel
+      selectedAIModel,
+      premiumUserCookieValue
     );
   };
 
@@ -514,6 +512,7 @@ export default function MyLayout() {
         isSelectModelDialogOpen={isSelectModelDialogOpen}
         setIsSelectModelDialogOpen={setIsSelectModelDialogOpen}
         setSelectedAIModel={setSelectedAIModel}
+        premiumUserCookieValue={premiumUserCookieValue}
       />
       <AddReactionDialog
         isAddReactionDialogOpen={isAddReactionDialogOpen}

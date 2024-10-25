@@ -193,7 +193,8 @@ async function makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInpu
   listOfRelays,
   setMessage,
   setConnectionGotCutOff,
-  selectedAIModel
+  selectedAIModel,
+  premiumUserCookieValue
 ) {
   try {
     let created_at_time = Math.floor(Date.now() / 1000);
@@ -213,6 +214,7 @@ async function makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInpu
       addReactionDialogOpenForMessage?.id
     );
     eventTemplate = addTag(eventTemplate, "model", selectedAIModel?.model);
+    eventTemplate = addTag(eventTemplate, "gold-ex", premiumUserCookieValue);
 
     const signedEvent = finalizeEvent(
       eventTemplate,
@@ -251,7 +253,8 @@ async function makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputF
   listOfRelays,
   setMessage,
   setConnectionGotCutOff,
-  selectedAIModel
+  selectedAIModel,
+  premiumUserCookieValue
 ) {
   try {
     let created_at_time = Math.floor(Date.now() / 1000);
@@ -265,6 +268,7 @@ async function makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputF
 
     eventTemplate = addTag(eventTemplate, "p", pk_other);
     eventTemplate = addTag(eventTemplate, "model", selectedAIModel?.model);
+    eventTemplate = addTag(eventTemplate, "gold-ex", premiumUserCookieValue);
 
     const signedEvent = finalizeEvent(
       eventTemplate,
@@ -310,7 +314,8 @@ const sendARetryMessage = async (
   listOfRelays,
   setMessage,
   setConnectionGotCutOff,
-  selectedAIModel
+  selectedAIModel,
+  premiumUserCookieValue
 ) => {
   try {
     let created_at_time = Math.floor(Date.now() / 1000);
@@ -325,6 +330,7 @@ const sendARetryMessage = async (
     eventTemplate = addTag(eventTemplate, "p", pk_other);
     eventTemplate = addTag(eventTemplate, "e", referencedMessageId);
     eventTemplate = addTag(eventTemplate, "model", selectedAIModel?.model);
+    eventTemplate = addTag(eventTemplate, "gold-ex", premiumUserCookieValue);
 
     const signedEvent = finalizeEvent(
       eventTemplate,
@@ -363,7 +369,8 @@ const makeAndPublishAReactionEvent = async (
   listOfRelays,
   connectionGotCutOff,
   recieveAndSetMessageHistory,
-  setConnectionGotCutOff
+  setConnectionGotCutOff,
+  premiumUserCookieValue
 ) => {
   try {
     let created_at_time = Math.floor(Date.now() / 1000);
@@ -381,6 +388,7 @@ const makeAndPublishAReactionEvent = async (
       "e",
       addReactionDialogOpenForMessage?.id
     );
+    eventTemplate = addTag(eventTemplate, "gold-ex", premiumUserCookieValue);
 
     const signedEvent = finalizeEvent(
       eventTemplate,
