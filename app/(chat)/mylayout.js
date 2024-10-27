@@ -31,7 +31,7 @@ import AboutIcon from "../svgs/AboutIcon";
 import AddIcon from "../svgs/AddIcon";
 import Link from "next/link";
 import { useParams, redirect } from "next/navigation";
-import { getCookieValue } from "../helpers/commonHelper"
+import { getCookieValue } from "../helpers/commonHelper";
 
 let pk_other =
   "npub1chadadwep45t4l7xx9z45p72xsxv7833zyy4tctdgh44lpc50nvsrjex2m";
@@ -43,7 +43,7 @@ let pool = new SimplePool();
 const uniqueEvents = new Set();
 
 export default function MyLayout() {
-  const premiumUserCookieValue = useMemo(() => getCookieValue('gold-ex'), []);
+  const premiumUserCookieValue = useMemo(() => getCookieValue("gold-ex"), []);
 
   const params = useParams();
 
@@ -127,7 +127,7 @@ export default function MyLayout() {
       currentTimeInUnixSeconds = null;
     }
 
-    let h = pool.subscribeMany( 
+    let h = pool.subscribeMany(
       listOfRelays,
       [
         {
@@ -139,9 +139,9 @@ export default function MyLayout() {
         async onevent(event) {
           // console.log(event)
 
-          if(uniqueEvents.has(event.id)) return
+          if (uniqueEvents.has(event.id)) return;
 
-          uniqueEvents.add(event.id)
+          uniqueEvents.add(event.id);
 
           if (
             currentTimeInUnixSeconds &&
@@ -219,7 +219,7 @@ export default function MyLayout() {
   }, []);
 
   const sendMessage = async () => {
-    checkLastRunAndExecute()
+    checkLastRunAndExecute();
 
     if (message.length === 0 || message.trim().length === 0 || message === "")
       return;
@@ -259,7 +259,7 @@ export default function MyLayout() {
   };
 
   const sendDefaultMessageOfAiModel = (message) => {
-    checkLastRunAndExecute()
+    checkLastRunAndExecute();
 
     makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField(
       publicKeyMyself,
@@ -339,7 +339,7 @@ export default function MyLayout() {
   }, [messageHistory]);
 
   const retryAMessage = async (selectedMessage) => {
-    checkLastRunAndExecute()
+    checkLastRunAndExecute();
 
     sendARetryMessage(
       publicKeyMyself,
@@ -412,8 +412,11 @@ export default function MyLayout() {
             </div>
 
             <div className="flex flex-col ml-4">
-              <div className="text-md font-semi-bold line-clamp-1 text-ellipsis break-anywhere overflow-hidden whitespace-normal font-roboto dark:text-gray-200">
-                {selectedAIModel.name} {selectedAIModel.description}
+              <div className="text-md font-semi-bold line-clamp-1 text-ellipsis break-anywhere overflow-hidden whitespace-normal font-roboto dark:text-gray-200 flex items-center justify-start">
+                <span>
+                  <BrainSvg />
+                </span>
+                <span className="ml-2">{"Pick a Brain"}</span>
               </div>
               <div className="text-[0.813rem] text-[#6b6b6b] dark:text-gray-400">
                 Contact:{" "}

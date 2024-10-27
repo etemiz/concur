@@ -1,11 +1,12 @@
 import localFont from "next/font/local";
 import "../globals.css";
-import { Roboto } from 'next/font/google';
+import { Roboto } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 
 const roboto = Roboto({
-  subsets: ['latin'],
-  variable: '--font-roboto',
-  weight: ['100', '300', '400', '500', '700', '900'],
+  subsets: ["latin"],
+  variable: "--font-roboto",
+  weight: ["100", "300", "400", "500", "700", "900"],
 });
 
 const geistSans = localFont({
@@ -31,6 +32,7 @@ export default function RootLayout({ children }) {
         className={`${roboto.variable} ${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-gray-900`}
       >
         {children}
+        <Toaster />
       </body>
     </html>
   );

@@ -76,9 +76,12 @@ const Payment = () => {
             <GoldenText> - Getting Support From Team</GoldenText>
           </div>
           <div className="w-full p-1">
-            <button className="w-full px-4 py-3 font-roboto font-normal text-xl text-white dark:text-black bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600">
+            <Link
+              href="/about"
+              className="inline-block flex items-center justify-center w-full px-4 py-3 font-roboto font-normal text-xl text-white dark:text-black bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600"
+            >
               Buy
-            </button>
+            </Link>
           </div>
         </div>
       </div>

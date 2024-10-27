@@ -12,6 +12,7 @@ import settings from "../../../settings.json";
 import { hexToBytes } from "@noble/hashes/utils";
 import { finalizeEvent } from "nostr-tools/pure";
 import GoldenText from "../../components/GoldenText";
+import toast from "react-hot-toast";
 
 let pk_other =
   "npub1nlk894teh248w2heuu0x8z6jjg2hyxkwdc8cxgrjtm9lnamlskcsghjm9c";
@@ -56,18 +57,27 @@ const About = () => {
 
     setMessage("");
     setEmail("");
+    toast("Success!", {
+      className: "text-white bg-green-400",
+      style: {
+        backgroundColor: "#28a745",
+        color: "white",
+        fontWeight: "bold",
+        fontSize: "18px",
+      },
+    });
   };
 
   const messageContent = () => {
     let s;
-    if(message) {
+    if (message) {
       s = message;
     }
-    if(email) {
+    if (email) {
       s = `${s} Email: ${email}`;
     }
     return s;
-  }
+  };
 
   return (
     <div className="w-full px-4">
@@ -102,10 +112,10 @@ const About = () => {
       </div>
       <div className="flex justify-center flex-row-reverse items-center">
         <p className="text-xl font-light font-roboto p-4 text-center bg-white/70 dark:bg-black/20 rounded-xl border dark:border-gray-600 max-w-5xl">
-          &quot;Concur is an AI app where you can send your questions to
-          experts. Each expert has their own AI model and will answer
-          differently. We consciously curate sources of wisdom and experts that
-          are aligned with humanity.&quot;
+          Concur is an AI app where you can send your questions to experts. Each
+          expert has their own AI model and will answer differently. We
+          consciously curate sources of wisdom and experts that are aligned with
+          humanity.
         </p>
       </div>
       <div className="w-full mt-10 mb-10">
@@ -119,7 +129,7 @@ const About = () => {
             </Link>
 
             <p className="mx-4 text-xl font-light font-roboto p-4 text-center bg-black/50 dark:bg-white/70 max-w-5xl bg-black text-white dark:text-black dark:bg-white my-3 mb-9 dark:border-gray-600">
-              &quot;Talks about our vision.&quot;
+              Talks about our vision.
             </p>
           </div>
         </div>
@@ -128,12 +138,19 @@ const About = () => {
         <div className="mx-auto max-w-5xl">
           <div className="font-roboto font-light p-4 flex flex-col justify-center items-center p-4 text-center bg-white/70 dark:bg-black/20 rounded-xl border w-full dark:border-gray-600">
             <p className="font-light font-roboto text-xl py-4 text-center max-w-5xl my-3 mb-9">
-              <span className="font-extrabold">&quot;</span>We love feedback.
-              Please send them using the form below.
-              <span className="font-extrabold">&quot;</span>
+              <span className="font-extrabold"></span>We love feedback. Please
+              send them using the form below.
+              <span className="font-extrabold"></span>
             </p>
 
-            <p className="font-roboto text-start">Detailed feedback and bug submitters will get <span className="font-bold"><GoldenText>Golden Brain badge</GoldenText></span> that will work for a few months and will be able to access more features for free. Be sure to add your email for that.</p>
+            <p className="font-roboto text-start">
+              Detailed feedback and bug submitters will get{" "}
+              <span className="font-bold">
+                <GoldenText>Golden Brain badge</GoldenText>
+              </span>{" "}
+              that will work for a few months and will be able to access more
+              features for free. Be sure to add your email for that.
+            </p>
 
             <br />
 

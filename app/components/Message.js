@@ -22,46 +22,66 @@ const Messages = ({
   numberOfHeaderBrainIcons,
   selectedAIModel,
 }) => {
+  let isMessageFromBot = false;
+  let alreadyGaveWarning = false;
+
   return (
     <div className="overflow-y-auto flex-grow justify-end text-black dark:text-gray-100 p-4 max-w-3xl mx-auto w-full">
-      {messageHistory?.map((message) => {
+      {messageHistory?.map((message, index) => {
+        let returnValue = null;
         if (message?.id === "status-message") {
-          return (
+          returnValue = (
             <StatusMessage
               key={message.id + Math.random()}
               message={message}
               sendDefaultMessageOfAiModel={sendDefaultMessageOfAiModel}
             />
           );
+        } else if (message?.isUser) {
+          returnValue = (
+            <MyMessage
+              message={message}
+              key={message.id}
+              setNumberOfHeaderBrainIcons={setNumberOfHeaderBrainIcons}
+              numberOfHeaderBrainIcons={numberOfHeaderBrainIcons}
+            />
+          );
         } else {
-          if (message?.isUser) {
-            return (
-              <MyMessage
-                message={message}
-                key={message.id}
-                setNumberOfHeaderBrainIcons={setNumberOfHeaderBrainIcons}
-                numberOfHeaderBrainIcons={numberOfHeaderBrainIcons}
-              />
-            );
-          } else {
-            return (
-              <TheirMessage
-                key={message.id}
-                message={message}
-                setAddReactionDialogOpenForMessage={
-                  setAddReactionDialogOpenForMessage
-                }
-                setIsAddReactionDialogOpen={setIsAddReactionDialogOpen}
-                reaction={reactionsOfMessages[message?.id]}
-                setInputValueForFeedbackIfDislikedMessageIsEdited={
-                  setInputValueForFeedbackIfDislikedMessageIsEdited
-                }
-                setFeedbackForMessage={setFeedbackForMessage}
-                retryAMessage={retryAMessage}
-              />
-            );
-          }
+          isMessageFromBot = true;
+
+          returnValue = (
+            <TheirMessage
+              key={message.id}
+              message={message}
+              setAddReactionDialogOpenForMessage={
+                setAddReactionDialogOpenForMessage
+              }
+              setIsAddReactionDialogOpen={setIsAddReactionDialogOpen}
+              reaction={reactionsOfMessages[message?.id]}
+              setInputValueForFeedbackIfDislikedMessageIsEdited={
+                setInputValueForFeedbackIfDislikedMessageIsEdited
+              }
+              setFeedbackForMessage={setFeedbackForMessage}
+              retryAMessage={retryAMessage}
+            />
+          );
         }
+
+        if (isMessageFromBot && !alreadyGaveWarning) {
+          alreadyGaveWarning = true;
+          returnValue = (
+            <>
+              {returnValue}
+              <div className="font-roboto font-light pl-6">
+                AI can hallucinate and make mistakes. You should double check
+                and compare the answers that you get here with a credible source
+                before acting on them.
+              </div>
+            </>
+          );
+        }
+
+        return returnValue;
       })}
 
       <div ref={bottomOfMessageHistoryList}></div>
@@ -95,7 +115,7 @@ const MyMessage = ({
     if (messageIsALearningRequest) {
       incrementBrainIconInHeaderIfLearningRequested();
     }
-  }, [])
+  }, []);
 
   return (
     <div className="flex flex-row-reverse my-2">
