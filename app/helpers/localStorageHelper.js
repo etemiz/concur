@@ -10,4 +10,20 @@ const getKeysFromLocalStorage = () => {
   return [secretKey, publicKey];
 };
 
-export { saveKeysToLocalStorage, getKeysFromLocalStorage };
+const saveAiCanHalucinateMessageToLocalStorage = (message) => {
+  // Convert JSON to string before saving
+  localStorage.setItem("aiCanHalucinateMessage", JSON.stringify(message));
+};
+
+const getAiCanHalucinateMessageFromLocalStorage = () => {
+  // Parse the string back into JSON
+  const message = localStorage.getItem("aiCanHalucinateMessage");
+  return message ? JSON.parse(message) : null;
+};
+
+export {
+  saveKeysToLocalStorage,
+  getKeysFromLocalStorage,
+  getAiCanHalucinateMessageFromLocalStorage,
+  saveAiCanHalucinateMessageToLocalStorage,
+};

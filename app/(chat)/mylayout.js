@@ -31,7 +31,16 @@ import AboutIcon from "../svgs/AboutIcon";
 import AddIcon from "../svgs/AddIcon";
 import Link from "next/link";
 import { useParams, redirect } from "next/navigation";
-import { getCookieValue } from "../helpers/commonHelper";
+import {
+  getCookieValue,
+  moreThanThreeMinutesHavePassed,
+  makeAiCanHallucinateMessage,
+  moreThanAWeekHasPassedSinceLastWarning,
+} from "../helpers/commonHelper";
+import {
+  getAiCanHalucinateMessageFromLocalStorage,
+  saveAiCanHalucinateMessageToLocalStorage,
+} from "../helpers/localStorageHelper";
 
 let pk_other =
   "npub1chadadwep45t4l7xx9z45p72xsxv7833zyy4tctdgh44lpc50nvsrjex2m";
@@ -39,6 +48,7 @@ let pk_other =
 pk_other = convertNostrPublicKeyToHex(pk_other);
 var sorted = new SortedArray([], (a, b) => a.created_at - b.created_at);
 let pool = new SimplePool();
+let aiCanHallucinateMessageAdded = false;
 
 const uniqueEvents = new Set();
 
@@ -137,7 +147,7 @@ export default function MyLayout() {
       ],
       {
         async onevent(event) {
-          // console.log(event)
+          // console.log(event);
 
           if (uniqueEvents.has(event.id)) return;
 
@@ -169,6 +179,11 @@ export default function MyLayout() {
               sorted,
               setMessageHistory
             );
+            if (!aiCanHallucinateMessageAdded) {
+              aiCanHallucinateMessageAdded = true;
+              sorted.insert(aiCanHallucinateMessage());
+              setMessageHistory([...sorted.array]);
+            }
           }
           if (event.pubkey === publicKey && event.tags[0][1] === pk_other) {
             decryptAndAddMyMessageToMessageHistory(
@@ -367,6 +382,25 @@ export default function MyLayout() {
     sorted.array = [selectedAIModelStatusMessage()];
     setMessageHistory([selectedAIModelStatusMessage()]);
     recieveAndSetMessageHistory(null, secretKey, publicKey);
+    saveAiCanHalucinateMessageToLocalStorage("");
+    aiCanHallucinateMessageAdded = false;
+  };
+
+  const aiCanHallucinateMessage = () => {
+    let res = getAiCanHalucinateMessageFromLocalStorage();
+
+    if (res) {
+      if (moreThanAWeekHasPassedSinceLastWarning(res)) {
+        res.created_at = Math.floor(Date.now() / 1000);
+        saveAiCanHalucinateMessageToLocalStorage(res);
+      }
+      return res;
+    } else {
+      res = makeAiCanHallucinateMessage();
+      saveAiCanHalucinateMessageToLocalStorage(res);
+
+      return res;
+    }
   };
 
   return (
@@ -417,15 +451,6 @@ export default function MyLayout() {
                   <BrainSvg />
                 </span>
                 <span className="ml-2">{"Pick a Brain"}</span>
-              </div>
-              <div className="text-[0.813rem] text-[#6b6b6b] dark:text-gray-400">
-                Contact:{" "}
-                <a
-                  className="decoration-solid underline"
-                  href="mailto:et@concur.guru"
-                >
-                  et@concur.guru
-                </a>
               </div>
             </div>
           </div>

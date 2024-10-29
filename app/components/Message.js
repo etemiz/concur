@@ -37,6 +37,14 @@ const Messages = ({
               sendDefaultMessageOfAiModel={sendDefaultMessageOfAiModel}
             />
           );
+        } else if (message?.id === "ai-can-hallucinate-message") {
+          returnValue = (
+            <div className="font-roboto font-light pl-6">
+              AI can hallucinate and make mistakes. You should double check and
+              compare the answers that you get here with a credible source
+              before acting on them.
+            </div>
+          );
         } else if (message?.isUser) {
           returnValue = (
             <MyMessage
@@ -64,20 +72,6 @@ const Messages = ({
               setFeedbackForMessage={setFeedbackForMessage}
               retryAMessage={retryAMessage}
             />
-          );
-        }
-
-        if (isMessageFromBot && !alreadyGaveWarning) {
-          alreadyGaveWarning = true;
-          returnValue = (
-            <>
-              {returnValue}
-              <div className="font-roboto font-light pl-6">
-                AI can hallucinate and make mistakes. You should double check
-                and compare the answers that you get here with a credible source
-                before acting on them.
-              </div>
-            </>
           );
         }
 
