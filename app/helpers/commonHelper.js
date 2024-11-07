@@ -7,12 +7,12 @@ const getCookieValue = (name) => {
   }
 };
 
-const makeAiCanHallucinateMessage = () => {
+const makeAiCanHallucinateMessage = (time_for_ai_can_hallucinate_message) => {
   return {
     id: "ai-can-hallucinate-message",
     content:
       "AI can hallucinate and make mistakes. You should double check and compare the answers that you get here with a credible source before acting on them.",
-    created_at: Math.floor(Date.now() / 1000) + 2,
+    created_at: time_for_ai_can_hallucinate_message,
     isReferencingTheMessage: "",
   };
 };

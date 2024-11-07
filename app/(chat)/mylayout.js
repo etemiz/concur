@@ -49,7 +49,7 @@ pk_other = convertNostrPublicKeyToHex(pk_other);
 var sorted = new SortedArray([], (a, b) => a.created_at - b.created_at);
 let pool = new SimplePool();
 let aiCanHallucinateMessageAdded = false;
-
+let isUserConversingWithBot = false;
 const uniqueEvents = new Set();
 
 export default function MyLayout() {
@@ -179,10 +179,13 @@ export default function MyLayout() {
               sorted,
               setMessageHistory
             );
-            if (!aiCanHallucinateMessageAdded) {
+            if (!aiCanHallucinateMessageAdded && isUserConversingWithBot) {
               aiCanHallucinateMessageAdded = true;
-              sorted.insert(aiCanHallucinateMessage());
-              setMessageHistory([...sorted.array]);
+              const res = aiCanHallucinateMessage(event.created_at + 1);
+              if (res) {
+                sorted.insert(res);
+                setMessageHistory([...sorted.array]);
+              }
             }
           }
           if (event.pubkey === publicKey && event.tags[0][1] === pk_other) {
@@ -235,6 +238,7 @@ export default function MyLayout() {
 
   const sendMessage = async () => {
     checkLastRunAndExecute();
+    isUserConversingWithBot = true;
 
     if (message.length === 0 || message.trim().length === 0 || message === "")
       return;
@@ -307,12 +311,14 @@ export default function MyLayout() {
   }, [selectedAIModel]);
 
   const selectedAIModelStatusMessage = () => {
+    const selectedAIModelCreatedAt = Math.floor(Date.now() / 1000);
+
     return {
       id: "status-message",
       name: selectedAIModel?.name,
       description: selectedAIModel?.description,
       questions: selectedAIModel?.questions,
-      created_at: Math.floor(Date.now() / 1000),
+      created_at: selectedAIModelCreatedAt,
       image: selectedAIModel?.image,
       isAThinkingMessageFromABot: false,
       isReferencingTheMessage: "",
@@ -382,21 +388,21 @@ export default function MyLayout() {
     sorted.array = [selectedAIModelStatusMessage()];
     setMessageHistory([selectedAIModelStatusMessage()]);
     recieveAndSetMessageHistory(null, secretKey, publicKey);
-    saveAiCanHalucinateMessageToLocalStorage("");
-    aiCanHallucinateMessageAdded = false;
   };
 
-  const aiCanHallucinateMessage = () => {
+  const aiCanHallucinateMessage = (time_for_ai_can_hallucinate_message) => {
     let res = getAiCanHalucinateMessageFromLocalStorage();
 
     if (res) {
       if (moreThanAWeekHasPassedSinceLastWarning(res)) {
         res.created_at = Math.floor(Date.now() / 1000);
         saveAiCanHalucinateMessageToLocalStorage(res);
+
+        return res;
       }
-      return res;
+      // return res;
     } else {
-      res = makeAiCanHallucinateMessage();
+      res = makeAiCanHallucinateMessage(time_for_ai_can_hallucinate_message);
       saveAiCanHalucinateMessageToLocalStorage(res);
 
       return res;
