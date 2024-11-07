@@ -395,7 +395,7 @@ export default function MyLayout() {
 
     if (res) {
       if (moreThanAWeekHasPassedSinceLastWarning(res)) {
-        res.created_at = Math.floor(Date.now() / 1000);
+        res.created_at = Math.floor(Date.now() / 1000) + 1;
         saveAiCanHalucinateMessageToLocalStorage(res);
 
         return res;
