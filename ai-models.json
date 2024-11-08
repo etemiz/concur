@@ -13,6 +13,20 @@
     "premium": false
   },
   {
+    "model": "def-pa",
+    "name": "Pamela",
+    "description": "Helpful assistant, Fast answers",
+    "image": "/BotPic.png",
+    "bot": "10",
+    "route": "/pa",
+    "questions": [
+      "What is PickaBrain.ai?",
+      "What is the symbiotic intelligence vision?",
+      "How can I use this website? What are different models?"
+    ],
+    "premium": false
+  },
+  {
     "model": "def-kc",
     "name": "K.C.",
     "description": "Doctor, Nutrition",
