@@ -16,7 +16,7 @@
     "model": "def-pa",
     "name": "Pamela",
     "description": "Helpful assistant, Fast answers \uD83D\uDE80",
-    "image": "/BotPic.png",
+    "image": "/anim.1731087657.png",
     "bot": "10",
     "route": "/pa",
     "questions": [
@@ -30,7 +30,7 @@
     "model": "def-mo",
     "name": "Molly",
     "description": "Fasting, Detoxing, Quick answers \uD83D\uDE80",
-    "image": "/BotPic.png",
+    "image": "/anim.1731088273.png",
     "bot": "11",
     "route": "/mo",
     "questions": [
@@ -44,7 +44,7 @@
     "model": "def-ab",
     "name": "Abraham",
     "description": "Herbalism, Supplements \uD83E\uDDE0 \uD83D\uDD75 \uD83E\uDDB8",
-    "image": "/BotPic.png",
+    "image": "/anim.1731088428.png",
     "bot": "12",
     "route": "/ab",
     "questions": [
@@ -58,7 +58,7 @@
     "model": "def-ko",
     "name": "Kooby",
     "description": "Faithful mystic, Ancient wisdom \uD83E\uDDE0 \uD83D\uDD75 \uD83E\uDDB8",
-    "image": "/BotPic.png",
+    "image": "/anim.1731088564.png",
     "bot": "13",
     "route": "/ko",
     "questions": [
