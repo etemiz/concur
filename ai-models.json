@@ -27,6 +27,34 @@
     "premium": false
   },
   {
+    "model": "def-mo",
+    "name": "Molly",
+    "description": "Fasting, Detoxing, Quick answers",
+    "image": "/BotPic.png",
+    "bot": "11",
+    "route": "/mo",
+    "questions": [
+      "Is fasting beneficial or dangerous?",
+      "Can juice fasts detoxify the body?",
+      "What is intermittent fasting?"
+    ],
+    "premium": false
+  },
+  {
+    "model": "def-ab",
+    "name": "Abraham",
+    "description": "Herbalism, Supplements; \uD83E\uDDE0 \uD83D\uDD75 \uD83E\uDDB8",
+    "image": "/BotPic.png",
+    "bot": "12",
+    "route": "/ab",
+    "questions": [
+      "Do medicinal herbs work?",
+      "What is a good herb for relaxation?",
+      "What is a good herb for stomach pain?"
+    ],
+    "premium": false
+  },
+  {
     "model": "def-kc",
     "name": "K.C.",
     "description": "Doctor, Nutrition",
