@@ -15,7 +15,7 @@
   {
     "model": "def-pa",
     "name": "Pamela",
-    "description": "Helpful assistant, Fast answers",
+    "description": "Helpful assistant, Fast answers \uD83D\uDE80",
     "image": "/BotPic.png",
     "bot": "10",
     "route": "/pa",
@@ -29,7 +29,7 @@
   {
     "model": "def-mo",
     "name": "Molly",
-    "description": "Fasting, Detoxing, Quick answers",
+    "description": "Fasting, Detoxing, Quick answers \uD83D\uDE80",
     "image": "/BotPic.png",
     "bot": "11",
     "route": "/mo",
@@ -43,7 +43,7 @@
   {
     "model": "def-ab",
     "name": "Abraham",
-    "description": "Herbalism, Supplements; \uD83E\uDDE0 \uD83D\uDD75 \uD83E\uDDB8",
+    "description": "Herbalism, Supplements \uD83E\uDDE0 \uD83D\uDD75 \uD83E\uDDB8",
     "image": "/BotPic.png",
     "bot": "12",
     "route": "/ab",
@@ -51,6 +51,20 @@
       "Do medicinal herbs work?",
       "What is a good herb for relaxation?",
       "What is a good herb for stomach pain?"
+    ],
+    "premium": false
+  },
+  {
+    "model": "def-ko",
+    "name": "Kooby",
+    "description": "Faithful mystic, Ancient wisdom \uD83E\uDDE0 \uD83D\uDD75 \uD83E\uDDB8",
+    "image": "/BotPic.png",
+    "bot": "13",
+    "route": "/ko",
+    "questions": [
+      "What is a good meditation technique?",
+      "What kind of prayers are good for healing?",
+      "What is a proper diet for spiritual work?"
     ],
     "premium": false
   },
