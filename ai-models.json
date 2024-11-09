@@ -1,28 +1,28 @@
 [
   {
     "model": "def",
-    "name": "O.S.",
-    "description": "Generalist, Libertarian",
-    "image": "/BotPic.png",
-    "bot": "1",
-    "route": "/os",
-    "questions": [
-      "Can prolonged fasting lead to permanent loss of muscle mass?",
-      "Is there a link between heavy metals in the environment and health problems?"
-    ],
-    "premium": false
-  },
-  {
-    "model": "def-pa",
     "name": "Pamela",
     "description": "Helpful assistant, Fast answers \uD83D\uDE80",
     "image": "/anim.1731087657.png",
-    "bot": "10",
-    "route": "/pa",
+    "bot": "1",
+    "route": "/os",
     "questions": [
       "What is PickaBrain.ai?",
       "What is the symbiotic intelligence vision?",
       "How can I use this website? What are different models?"
+    ],
+    "premium": false
+  },
+  {
+    "model": "def-os",
+    "name": "O.S.",
+    "description": "Generalist, Libertarian \uD83E\uDDE0 \uD83D\uDD75",
+    "image": "/BotPic.png",
+    "bot": "10",
+    "route": "/os",
+    "questions": [
+      "Can prolonged fasting lead to permanent loss of muscle mass?",
+      "Is there a link between heavy metals in the environment and health problems?"
     ],
     "premium": false
   },
