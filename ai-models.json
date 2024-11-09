@@ -5,7 +5,7 @@
     "description": "Helpful assistant, Fast answers \uD83D\uDE80",
     "image": "/anim.1731087657.png",
     "bot": "1",
-    "route": "/os",
+    "route": "/pa",
     "questions": [
       "What is PickaBrain.ai?",
       "What is the symbiotic intelligence vision?",
