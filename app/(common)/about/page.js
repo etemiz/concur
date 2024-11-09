@@ -112,27 +112,19 @@ const About = () => {
       </div>
       <div className="flex justify-center flex-row-reverse items-center">
         <p className="text-xl font-light font-roboto p-4 text-center bg-white/70 dark:bg-black/20 rounded-xl border dark:border-gray-600 max-w-5xl">
-          Concur is an AI app where you can send your questions to experts. Each
-          expert has their own AI model and will answer differently. We
-          consciously curate sources of wisdom and experts that are aligned with
-          humanity.
-        </p>
-      </div>
-      <div className="w-full mt-10 mb-10">
-        <div className="mx-auto max-w-5xl mx-4">
-          <div className="font-roboto font-light p-4 flex flex-col justify-center items-center p-4 text-center bg-white/70 dark:bg-black/20 rounded-xl border w-full dark:border-gray-600">
-            <Link
+          PickaBrain.ai is a website which hosts various AI models to which you can send your questions.
+          We strive to curate sources of wisdom and experts that are aligned with humanity.
+          We think our models are the most based, awake out there.
+          You may get different answers than mainstream and those can be better solutions to problems.
+          Each model will answer somewhat differently.
+          Some models are for fun, and some models are based on real world humans, who we like calling 'human role models'.
+          We talk about our vision and about this website in our blog: <Link
               href="http://etemiz.substack.com/"
               className="font-roboto text-3xl sm:text-3xl md:text-3xl lg:text-4xl xl:text-4xl font-bold text-center text-gray-800 dark:text-gray-300 my-5 decoration-solid underline cursor-pointer"
             >
               Symbiotic Intelligence Blog
             </Link>
-
-            <p className="mx-4 text-xl font-light font-roboto p-4 text-center bg-black/50 dark:bg-white/70 max-w-5xl bg-black text-white dark:text-black dark:bg-white my-3 mb-9 dark:border-gray-600">
-              Talks about our vision.
-            </p>
-          </div>
-        </div>
+        </p>
       </div>
       <div className="w-full mt-10 mb-10">
         <div className="mx-auto max-w-5xl">
@@ -190,7 +182,12 @@ const About = () => {
                 If you prefer to Email founder{" "}
                 <a className="underline" href="mailto:et@concur.guru">
                   et@concur.guru
-                </a>{" "}
+                </a>
+
+
+              </p>
+              <p>
+              <Link      href="http://x.com/etemiz/"  >x.com/etemiz</Link>
               </p>
             </div>
           </div>
