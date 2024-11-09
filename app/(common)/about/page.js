@@ -112,18 +112,23 @@ const About = () => {
       </div>
       <div className="flex justify-center flex-row-reverse items-center">
         <p className="text-xl font-light font-roboto p-4 text-center bg-white/70 dark:bg-black/20 rounded-xl border dark:border-gray-600 max-w-5xl">
-          PickaBrain.ai is a website which hosts various AI models to which you can send your questions.
-          We strive to curate sources of wisdom and experts that are aligned with humanity.
-          We think our models are the most based, awake out there.
-          You may get different answers than mainstream and those can be better solutions to problems.
-          Each model will answer somewhat differently.
-          Some models are for fun, and some models are based on real world humans, who we like calling &apos;human role models&apos;.
-          We talk about our vision and about this website in our blog: <Link
-              href="http://etemiz.substack.com/"
-              className="font-roboto text-3xl sm:text-3xl md:text-3xl lg:text-4xl xl:text-4xl font-bold text-center text-gray-800 dark:text-gray-300 my-5 decoration-solid underline cursor-pointer"
-            >
-              Symbiotic Intelligence Blog
-            </Link>
+        Welcome to PickaBrain.ai, a haven for curious minds! 🌟 This platform hosts a diverse array of AI models, each with its unique perspective and expertise.
+        Our mission is to curate a collective of wisdom and expertise that resonates with humanity&apos;s values.
+        <br/>
+        <br/>
+        We&apos;re committed to fostering a symbiotic relationship between humans and machines, one that harnesses the strengths of both to create innovative solutions.
+        <br/>
+        <br/>
+        While our models may sometimes diverge from mainstream opinions, it&apos;s precisely this diversity of thought that can lead to breakthroughs
+        and more elegant solutions. Each model brings its own distinct voice and approach to the table.
+        <br/>
+        <br/>
+        Some of our models are designed for entertainment and creative exploration, while others are rooted in real-world human wisdom.
+        We like to call these &apos;human role models&apos;, who embody the best of our collective knowledge and experience.
+        <br/>
+        <br/>
+        For a deeper dive into our vision and philosophy, please visit our <a href="http://etemiz.substack.com"><u>Symbiotic Intelligence Blog</u></a>, where we explore the
+        intersection of humans and machines in pursuit of a brighter, more harmonious future.
         </p>
       </div>
       <div className="w-full mt-10 mb-10">
@@ -177,9 +182,10 @@ const About = () => {
               >
                 SEND
               </button>
-
+<p>
+</p>
               <p>
-                If you prefer to Email founder{" "}
+                Email:
                 <a className="underline" href="mailto:et@concur.guru">
                   et@concur.guru
                 </a>
@@ -187,7 +193,7 @@ const About = () => {
 
               </p>
               <p>
-              <Link      href="http://x.com/etemiz/"  >x.com/etemiz</Link>
+              Twitter: <a className="underline"  href="http://x.com/etemiz/">x.com/etemiz</a>
               </p>
             </div>
           </div>
