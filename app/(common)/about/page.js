@@ -117,7 +117,7 @@ const About = () => {
           We think our models are the most based, awake out there.
           You may get different answers than mainstream and those can be better solutions to problems.
           Each model will answer somewhat differently.
-          Some models are for fun, and some models are based on real world humans, who we like calling 'human role models'.
+          Some models are for fun, and some models are based on real world humans, who we like calling &apos;human role models&apos;.
           We talk about our vision and about this website in our blog: <Link
               href="http://etemiz.substack.com/"
               className="font-roboto text-3xl sm:text-3xl md:text-3xl lg:text-4xl xl:text-4xl font-bold text-center text-gray-800 dark:text-gray-300 my-5 decoration-solid underline cursor-pointer"
