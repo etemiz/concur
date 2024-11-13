@@ -57,7 +57,7 @@
   {
     "model": "def-ko",
     "name": "Kooby",
-    "description": "Faithful mystic, Ancient wisdom \uD83E\uDDE0 \uD83D\uDD75 \uD83E\uDDB8",
+    "description": "Ancient wisdom, Mystic \uD83E\uDDE0 \uD83D\uDD75 \uD83E\uDDB8",
     "image": "/anim.1731088564.png",
     "bot": "13",
     "route": "/ko",
@@ -71,7 +71,7 @@
   {
     "model": "def-kc",
     "name": "K.C.",
-    "description": "Doctor, Nutrition",
+    "description": "Doctor, Nutrition \uD83E\uDDB8",
     "image": "https://thumbs.dreamstime.com/z/healthy-organic-diet-nutrition-illustration-concept-doctor-depicting-good-health-depends-lifestyle-305157235.jpg?w=576",
     "bot": "2",
     "route": "/kc",
@@ -84,7 +84,7 @@
   {
     "model": "def-jn",
     "name": "J.N.",
-    "description": "Alternative medicine, Nutrition",
+    "description": "Alternative medicine, Nutrition \uD83E\uDDE0",
     "image": "https://images.nightcafe.studio/jobs/rKQggpxhPkIM31jO2vGV/rKQggpxhPkIM31jO2vGV--1--5kyci.jpg?tr=w-1600,c-at_max",
     "bot": "3",
     "route": "/jn",
@@ -97,8 +97,8 @@
   {
     "model": "def-dc",
     "name": "D.C.",
-    "description": "Vaccine Researcher",
-    "image": "https://static.vecteezy.com/system/resources/previews/014/004/586/large_2x/research-of-covid-19-virus-vaccine-concept-young-woman-scientist-in-medical-medical-face-mask-looking-at-syringe-in-laboratory-doing-some-research-illustration-free-vector.jpg",
+    "description": "Vaccine Researcher \uD83E\uDDB8",
+    "image": "/anim.1731538412.png",
     "bot": "4",
     "route": "/dc",
     "questions": [
@@ -123,7 +123,7 @@
   {
     "model": "def-ce",
     "name": "C.E.",
-    "description": "A truth seeker",
+    "description": "Healthy living, Based history \uD83E\uDDE0 \uD83D\uDD75",
     "image": "https://img.freepik.com/premium-photo/sherlock-holmes-vector-illustration_996136-3008.jpg",
     "bot": "6",
     "route": "/ce",
@@ -162,7 +162,7 @@
   {
     "model": "def-mr",
     "name": "M.R.",
-    "description": "Fasting, Detoxing",
+    "description": "Fasting, Detoxing \uD83D\uDD75 \uD83D\uDE80",
     "image": "https://media.istockphoto.com/id/1385373419/vector/intermittent-fasting-concept-man-run-in-clock-waiting-for-time-to-eat-healthy-food-boy.jpg?s=612x612&w=is&k=20&c=ekIJxu5zjbB4w3Z1ipNTFiiHh8IeV8CPnomM1GM3_e0=",
     "bot": "9",
     "route": "/mr",
