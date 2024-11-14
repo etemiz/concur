@@ -71,7 +71,7 @@
   {
     "model": "def-kc",
     "name": "K.C.",
-    "description": "Doctor, Nutrition \uD83E\uDDB8",
+    "description": "Carnivore diet, Author \uD83E\uDDB8",
     "image": "https://thumbs.dreamstime.com/z/healthy-organic-diet-nutrition-illustration-concept-doctor-depicting-good-health-depends-lifestyle-305157235.jpg?w=576",
     "bot": "2",
     "route": "/kc",
