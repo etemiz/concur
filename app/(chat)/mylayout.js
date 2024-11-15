@@ -248,13 +248,14 @@ export default function MyLayout() {
   }, []);
 
   const sendMessage = async () => {
-    checkLastRunAndExecute();
     isUserConversingWithBot = true;
 
     if (message.length === 0 || message.trim().length === 0 || message === "")
       return;
 
     if (isMessageAFeedbackOfBotsResponse(message)) {
+      checkLastRunAndExecute();
+
       makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInputField(
         publicKeyMyself,
         secretKeyMyself,
@@ -271,7 +272,7 @@ export default function MyLayout() {
         premiumUserCookieValue
       );
     } else {
-      makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField(
+      const messageToPublish = await makeANormalMessageAndAddToMessageHistory(
         publicKeyMyself,
         secretKeyMyself,
         pk_other,
@@ -287,6 +288,27 @@ export default function MyLayout() {
         uniqueEvents,
         setMessageHistory,
         sorted
+      );
+
+      checkLastRunAndExecute();
+
+      publishANormalMessage(
+        publicKeyMyself,
+        secretKeyMyself,
+        pk_other,
+        message,
+        connectionGotCutOff,
+        recieveAndSetMessageHistory,
+        pool,
+        listOfRelays,
+        setMessage,
+        setConnectionGotCutOff,
+        selectedAIModel,
+        premiumUserCookieValue,
+        uniqueEvents,
+        setMessageHistory,
+        sorted,
+        messageToPublish
       );
     }
   };
