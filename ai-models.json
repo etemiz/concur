@@ -171,5 +171,19 @@
       "Can juice fasts detoxify the body?"
     ],
     "premium": false
+  },
+  {
+    "model": "def-m8",
+    "name": "Meow 8B",
+    "description": "Playful cat bot \uD83D\uDD75 \uD83D\uDE80 \uD83D\uDC08",
+    "image": "/anim.1731688637.png",
+    "bot": "14",
+    "route": "/m8",
+    "questions": [
+      "What can you do for me?",
+      "What is the meaning of the universe?",
+      "How can I select other characters?"
+    ],
+    "premium": false
   }
 ]
