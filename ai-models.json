@@ -175,14 +175,15 @@
   {
     "model": "def-m8",
     "name": "Meow 8B",
-    "description": "Playful cat bot \uD83D\uDD75 \uD83D\uDE80 \uD83D\uDC08",
+    "description": " \uD83D\uDC08 Playful cat bot \uD83D\uDD75 \uD83D\uDE80",
     "image": "/anim.1731688637.png",
     "bot": "14",
     "route": "/m8",
     "questions": [
-      "What can you do for me?",
-      "What is the meaning of the universe?",
-      "How can I select other characters?"
+      "What's the secret to chasing a laser pointer for hours on end without getting tired?",
+      "Does the red dot even exist?",
+      "Can you translate cat language for me? I want to know what my cat says when they're plotting world domination!",
+      "Can you teach me how to be as lazy as a cat? I want to spend all day napping and pestering my human for snacks!"
     ],
     "premium": false
   }
