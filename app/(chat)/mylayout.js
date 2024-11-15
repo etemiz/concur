@@ -19,6 +19,8 @@ import {
   isAThinkingMessageFromABot,
   handleThinkingMessageFromABot,
   generateNewClientKeysAndSaveThem,
+  makeANormalMessageAndAddToMessageHistory,
+  publishANormalMessage,
 } from "../helpers/nip4Helpers";
 import aiModelsData from "../../ai-models.json";
 import BrainSvg from "../svgs/BrainSvg";
@@ -289,8 +291,26 @@ export default function MyLayout() {
     }
   };
 
-  const sendDefaultMessageOfAiModel = (message) => {
-    makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField(
+  const sendDefaultMessageOfAiModel = async (message) => {
+    // makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField(
+    //   publicKeyMyself,
+    //   secretKeyMyself,
+    //   pk_other,
+    //   message,
+    //   connectionGotCutOff,
+    //   recieveAndSetMessageHistory,
+    //   pool,
+    //   listOfRelays,
+    //   setMessage,
+    //   setConnectionGotCutOff,
+    //   selectedAIModel,
+    //   premiumUserCookieValue,
+    //   uniqueEvents,
+    //   setMessageHistory,
+    //   sorted
+    // );
+
+    const messageToPublish = await makeANormalMessageAndAddToMessageHistory(
       publicKeyMyself,
       secretKeyMyself,
       pk_other,
@@ -309,6 +329,25 @@ export default function MyLayout() {
     );
 
     checkLastRunAndExecute();
+
+    publishANormalMessage(
+      publicKeyMyself,
+      secretKeyMyself,
+      pk_other,
+      message,
+      connectionGotCutOff,
+      recieveAndSetMessageHistory,
+      pool,
+      listOfRelays,
+      setMessage,
+      setConnectionGotCutOff,
+      selectedAIModel,
+      premiumUserCookieValue,
+      uniqueEvents,
+      setMessageHistory,
+      sorted,
+      messageToPublish
+    )
   };
 
   const handleKeyDown = (event) => {
