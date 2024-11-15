@@ -107,6 +107,8 @@ export default function MyLayout() {
     setPublicKeyMyself(publicKey);
 
     recieveAndSetMessageHistory(null, secretKey, publicKey);
+
+    updateLastRunTime()
   }, []);
 
   const recieveAndSetMessageHistory = (
@@ -232,6 +234,13 @@ export default function MyLayout() {
     }
   }
 
+  function updateLastRunTime() {
+    const lastRunKey = "lastRunTime";
+    const currentTime = new Date();
+
+    localStorage.setItem(lastRunKey, currentTime.toISOString());
+  }
+
   useEffect(() => {
     return () => relayPool?.close();
   }, []);
@@ -272,14 +281,15 @@ export default function MyLayout() {
         setMessage,
         setConnectionGotCutOff,
         selectedAIModel,
-        premiumUserCookieValue
+        premiumUserCookieValue,
+        uniqueEvents,
+        setMessageHistory,
+        sorted
       );
     }
   };
 
   const sendDefaultMessageOfAiModel = (message) => {
-    checkLastRunAndExecute();
-
     makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField(
       publicKeyMyself,
       secretKeyMyself,
@@ -292,8 +302,13 @@ export default function MyLayout() {
       setMessage,
       setConnectionGotCutOff,
       selectedAIModel,
-      premiumUserCookieValue
+      premiumUserCookieValue,
+      uniqueEvents,
+      setMessageHistory,
+      sorted
     );
+
+    checkLastRunAndExecute();
   };
 
   const handleKeyDown = (event) => {

@@ -254,7 +254,10 @@ async function makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputF
   setMessage,
   setConnectionGotCutOff,
   selectedAIModel,
-  premiumUserCookieValue
+  premiumUserCookieValue,
+  uniqueEvents,
+  setMessageHistory,
+  sorted
 ) {
   try {
     let created_at_time = Math.floor(Date.now() / 1000);
@@ -278,6 +281,18 @@ async function makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputF
     if (connectionGotCutOff) recieveAndSetMessageHistory(created_at_time);
 
     await Promise.any(pool.publish(listOfRelays, signedEvent));
+
+    const res = sorted.insert({
+      ...signedEvent,
+      text: message,
+      isUser: true,
+      isAThinkingMessageFromABot: false,
+      isReferencingTheMessage: "",
+    });
+  
+    setMessageHistory([...res.array]);
+
+    uniqueEvents.add(signedEvent.id);
 
     setMessage("");
   } catch (error) {
