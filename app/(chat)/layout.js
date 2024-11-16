@@ -2,6 +2,7 @@ import localFont from "next/font/local";
 import "../globals.css";
 import { Roboto } from 'next/font/google';
 import MyLayout from "./mylayout";
+import { Analytics } from "@vercel/analytics/react"
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -35,6 +36,7 @@ export default function RootLayout({ children }) {
         <MyLayout>
           {children}
         </MyLayout>
+        <Analytics />
       </body>
     </html>
   );
