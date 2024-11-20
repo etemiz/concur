@@ -252,6 +252,7 @@ const TheirMessage = ({
 const StatusMessage = ({ message, sendDefaultMessageOfAiModel }) => {
   return (
     <div className="w-full flex flex-col items-center mt-6 mt-4">
+      <div className="mb-4">You are talking to: {message.name}</div>
       <div className="h-[60px] w-[60px] min-w-[60px]">
         <Image
           className="rounded-full w-[60px] h-[60px] object-cover"
@@ -264,7 +265,7 @@ const StatusMessage = ({ message, sendDefaultMessageOfAiModel }) => {
 
       <div className="flex flex-col items-center w-full mt-4">
         <div className="text-md py-1 text-center font-semi-bold line-clamp-1 text-ellipsis break-anywhere overflow-hidden whitespace-normal font-roboto dark:text-gray-200">
-          {message.name} {message.description}
+          Speciality: {message.description}
         </div>
         {message.questions.map((question, index) => (
           <div
