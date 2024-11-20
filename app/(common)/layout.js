@@ -22,8 +22,8 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "Pick A Brain",
-  description: "Pick A Brain",
+  title: "Pick a Brain",
+  description: "Making more helpful, human oriented, high privacy AI as part of symbiotic intelligence vision that will align AI with humans in a better way.",
 };
 
 export default function RootLayout({ children }) {
