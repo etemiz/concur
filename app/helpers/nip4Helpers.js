@@ -254,7 +254,10 @@ async function makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputF
   setMessage,
   setConnectionGotCutOff,
   selectedAIModel,
-  premiumUserCookieValue
+  premiumUserCookieValue,
+  uniqueEvents,
+  setMessageHistory,
+  sorted
 ) {
   try {
     let created_at_time = Math.floor(Date.now() / 1000);
@@ -279,6 +282,18 @@ async function makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputF
 
     await Promise.any(pool.publish(listOfRelays, signedEvent));
 
+    const res = sorted.insert({
+      ...signedEvent,
+      text: message,
+      isUser: true,
+      isAThinkingMessageFromABot: false,
+      isReferencingTheMessage: "",
+    });
+  
+    setMessageHistory([...res.array]);
+
+    uniqueEvents.add(signedEvent.id);
+
     setMessage("");
   } catch (error) {
     setConnectionGotCutOff(true);
@@ -295,6 +310,101 @@ async function makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputF
     console.error(error);
   }
 }
+
+const makeANormalMessageAndAddToMessageHistory = async (
+  publicKeyMyself,
+  secretKeyMyself,
+  pk_other,
+  message,
+  connectionGotCutOff,
+  recieveAndSetMessageHistory,
+  pool,
+  listOfRelays,
+  setMessage,
+  setConnectionGotCutOff,
+  selectedAIModel,
+  premiumUserCookieValue,
+  uniqueEvents,
+  setMessageHistory,
+  sorted
+) => {
+  try {
+    let created_at_time = Math.floor(Date.now() / 1000);
+    let eventTemplate = {
+      pubkey: publicKeyMyself,
+      created_at: created_at_time,
+      kind: 4,
+      tags: [],
+      content: await encrypt(secretKeyMyself, pk_other, message),
+    };
+
+    eventTemplate = addTag(eventTemplate, "p", pk_other);
+    eventTemplate = addTag(eventTemplate, "model", selectedAIModel?.model);
+    eventTemplate = addTag(eventTemplate, "gold-ex", premiumUserCookieValue);
+
+    const signedEvent = finalizeEvent(
+      eventTemplate,
+      hexToBytes(secretKeyMyself)
+    );
+
+    const res = sorted.insert({
+      ...signedEvent,
+      text: message,
+      isUser: true,
+      isAThinkingMessageFromABot: false,
+      isReferencingTheMessage: "",
+    });
+  
+    setMessageHistory([...res.array]);
+
+    uniqueEvents.add(signedEvent.id);
+
+    setMessage("");
+
+    return signedEvent;
+  } catch (error) {
+  }
+};
+
+const publishANormalMessage = async (
+  publicKeyMyself,
+  secretKeyMyself,
+  pk_other,
+  message,
+  connectionGotCutOff,
+  recieveAndSetMessageHistory,
+  pool,
+  listOfRelays,
+  setMessage,
+  setConnectionGotCutOff,
+  selectedAIModel,
+  premiumUserCookieValue,
+  uniqueEvents,
+  setMessageHistory,
+  sorted,
+  signedEvent
+) => {
+  try {
+    if (connectionGotCutOff) recieveAndSetMessageHistory(signedEvent.created_at_time);
+
+    await Promise.any(pool.publish(listOfRelays, signedEvent));
+
+  } catch (error) {
+    setConnectionGotCutOff(true);
+
+    let errorMessages = "";
+    if (error instanceof AggregateError) {
+      error.errors.forEach((err, index) => {
+        errorMessages += `Error ${index + 1}: ${err.message || err}\n`;
+      });
+    } else {
+      errorMessages = error.message || "An unknown error occurred";
+    }
+    alert(`Multiple errors occurred:\n\n${errorMessages}`);
+    console.error(error);
+  }
+}
+
 
 const addTag = (event, tagKey, tagValue) => {
   return {
@@ -466,4 +576,6 @@ export {
   isAThinkingMessageFromABot,
   handleThinkingMessageFromABot,
   generateNewClientKeysAndSaveThem,
+  makeANormalMessageAndAddToMessageHistory,
+  publishANormalMessage,
 };

@@ -19,6 +19,8 @@ import {
   isAThinkingMessageFromABot,
   handleThinkingMessageFromABot,
   generateNewClientKeysAndSaveThem,
+  makeANormalMessageAndAddToMessageHistory,
+  publishANormalMessage,
 } from "../helpers/nip4Helpers";
 import aiModelsData from "../../ai-models.json";
 import BrainSvg from "../svgs/BrainSvg";
@@ -107,6 +109,8 @@ export default function MyLayout() {
     setPublicKeyMyself(publicKey);
 
     recieveAndSetMessageHistory(null, secretKey, publicKey);
+
+    updateLastRunTime()
   }, []);
 
   const recieveAndSetMessageHistory = (
@@ -232,18 +236,26 @@ export default function MyLayout() {
     }
   }
 
+  function updateLastRunTime() {
+    const lastRunKey = "lastRunTime";
+    const currentTime = new Date();
+
+    localStorage.setItem(lastRunKey, currentTime.toISOString());
+  }
+
   useEffect(() => {
     return () => relayPool?.close();
   }, []);
 
   const sendMessage = async () => {
-    checkLastRunAndExecute();
     isUserConversingWithBot = true;
 
     if (message.length === 0 || message.trim().length === 0 || message === "")
       return;
 
     if (isMessageAFeedbackOfBotsResponse(message)) {
+      checkLastRunAndExecute();
+
       makeAFeedbackMessageEventAndPublishToRelayPoolAndClearMessageInputField(
         publicKeyMyself,
         secretKeyMyself,
@@ -260,7 +272,7 @@ export default function MyLayout() {
         premiumUserCookieValue
       );
     } else {
-      makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField(
+      const messageToPublish = await makeANormalMessageAndAddToMessageHistory(
         publicKeyMyself,
         secretKeyMyself,
         pk_other,
@@ -272,15 +284,55 @@ export default function MyLayout() {
         setMessage,
         setConnectionGotCutOff,
         selectedAIModel,
-        premiumUserCookieValue
+        premiumUserCookieValue,
+        uniqueEvents,
+        setMessageHistory,
+        sorted
+      );
+
+      checkLastRunAndExecute();
+
+      publishANormalMessage(
+        publicKeyMyself,
+        secretKeyMyself,
+        pk_other,
+        message,
+        connectionGotCutOff,
+        recieveAndSetMessageHistory,
+        pool,
+        listOfRelays,
+        setMessage,
+        setConnectionGotCutOff,
+        selectedAIModel,
+        premiumUserCookieValue,
+        uniqueEvents,
+        setMessageHistory,
+        sorted,
+        messageToPublish
       );
     }
   };
 
-  const sendDefaultMessageOfAiModel = (message) => {
-    checkLastRunAndExecute();
+  const sendDefaultMessageOfAiModel = async (message) => {
+    // makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField(
+    //   publicKeyMyself,
+    //   secretKeyMyself,
+    //   pk_other,
+    //   message,
+    //   connectionGotCutOff,
+    //   recieveAndSetMessageHistory,
+    //   pool,
+    //   listOfRelays,
+    //   setMessage,
+    //   setConnectionGotCutOff,
+    //   selectedAIModel,
+    //   premiumUserCookieValue,
+    //   uniqueEvents,
+    //   setMessageHistory,
+    //   sorted
+    // );
 
-    makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField(
+    const messageToPublish = await makeANormalMessageAndAddToMessageHistory(
       publicKeyMyself,
       secretKeyMyself,
       pk_other,
@@ -292,8 +344,32 @@ export default function MyLayout() {
       setMessage,
       setConnectionGotCutOff,
       selectedAIModel,
-      premiumUserCookieValue
+      premiumUserCookieValue,
+      uniqueEvents,
+      setMessageHistory,
+      sorted
     );
+
+    checkLastRunAndExecute();
+
+    publishANormalMessage(
+      publicKeyMyself,
+      secretKeyMyself,
+      pk_other,
+      message,
+      connectionGotCutOff,
+      recieveAndSetMessageHistory,
+      pool,
+      listOfRelays,
+      setMessage,
+      setConnectionGotCutOff,
+      selectedAIModel,
+      premiumUserCookieValue,
+      uniqueEvents,
+      setMessageHistory,
+      sorted,
+      messageToPublish
+    )
   };
 
   const handleKeyDown = (event) => {
