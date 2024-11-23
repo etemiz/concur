@@ -37,12 +37,15 @@ const Payment = () => {
       <div className="flex justify-center">
         <div className="bg-white/70 dark:bg-black/20 rounded-xl border dark:border-gray-600 p-2 w-full m-1 max-w-xl">
           <div className="p-1 text-xl text-center">Free</div>
-          <div className="p-1 font-roboto font-light">- Dumb AI</div>
+          <div className="p-1 font-roboto font-light">- Not sophisticated AI</div>
           <div className="p-1 font-roboto font-light">
-            - Questions Wait In line
+            - Questions may wait in queue
           </div>
           <div className="p-1 font-roboto font-light">
-            - Slow answer Generations
+            - Limited amount of questions
+          </div>
+          <div className="p-1 font-roboto font-light">
+            - Not optimally curated
           </div>
         </div>
         <div className="bg-white/70 dark:bg-black/20 rounded-xl border dark:border-gray-600 p-2 w-full m-1 max-w-xl">
@@ -61,26 +64,26 @@ const Payment = () => {
             <GoldenText>- Smarter AI</GoldenText>
           </div>
           <div className="p-1 font-roboto font-normal">
-            <GoldenText>- Unlimited Questions</GoldenText>
+            <GoldenText>- Optimally curated by humans</GoldenText>
           </div>
           <div className="p-1 font-roboto font-normal">
-            <GoldenText>- Faster Answers</GoldenText>
+            <GoldenText>- Unlimited questions</GoldenText>
           </div>
           <div className="p-1 font-roboto font-normal">
-            <GoldenText>- No Queue</GoldenText>
+            <GoldenText>- Longer answers</GoldenText>
           </div>
           <div className="p-1 font-roboto font-normal">
-            <GoldenText>- Supporting a Good Cause</GoldenText>
+            <GoldenText>- No queue</GoldenText>
           </div>
           <div className="p-1 font-roboto font-normal">
-            <GoldenText> - Getting Support From Team</GoldenText>
+            <GoldenText>- Supporting a good cause</GoldenText>
           </div>
           <div className="w-full p-1">
             <Link
               href="/about"
               className="inline-block flex items-center justify-center w-full px-4 py-3 font-roboto font-normal text-xl text-white dark:text-black bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600"
             >
-              Buy
+              Activate
             </Link>
           </div>
         </div>
