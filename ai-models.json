@@ -14,6 +14,21 @@
     "premium": false
   },
   {
+    "model": "def-bc",
+    "name": "Based Chad",
+    "description": " Truth warrior, Mansplaining \uD83E\uDD38 🧐 \uD83E\uDDE0",
+    "image": "/based-chad.png",
+    "bot": "15",
+    "route": "/bc",
+    "questions": [
+      "Are chemtrails real and should I be worried?",
+      "What is underneath the Denver Airport?",
+      "What psychic phenomenon has been scientifically demonstrated?",
+      "What do even scientists grudgingly acknowledge about crystals and energy?"
+    ],
+    "premium": false
+  },
+  {
     "model": "def-os",
     "name": "O.S.",
     "description": "Generalist, Libertarian \uD83E\uDDE0 🧐",
@@ -110,7 +125,7 @@
   {
     "model": "def-ec",
     "name": "E.C.",
-    "description": "Keto, Intermittent fasting",
+    "description": "Keto, Intermittent fasting \uD83E\uDD38",
     "image": "https://cdn.vectorstock.com/i/1000x1000/43/39/vegetable-healthy-diet-vector-22714339.webp",
     "bot": "5",
     "route": "/ec",
@@ -134,48 +149,9 @@
     "premium": false
   },
   {
-    "model": "def-sf",
-    "name": "S.F.",
-    "description": "Chiropractor, Healing",
-    "image": "https://as1.ftcdn.net/v2/jpg/03/11/30/56/1000_F_311305698_JqH1TIwCpCnOHM9BRAr0Xu0kksrTbxdk.jpg",
-    "bot": "7",
-    "route": "/sf",
-    "questions": [
-      "Can crystals heal emotional trauma?",
-      "Do herbal extracts have a stronger therapeutic effect than whole herbs?"
-    ],
-    "premium": true
-  },
-  {
-    "model": "def-jg",
-    "name": "J.G.",
-    "description": "Diabetes, Fasting",
-    "image": "/anim.1731688617.png",
-    "bot": "8",
-    "route": "/jg",
-    "questions": [
-      "Should pregnant women fast for health benefits?",
-      "How can you target fat loss in your abdomen?"
-    ],
-    "premium": true
-  },
-  {
-    "model": "def-mr",
-    "name": "M.R.",
-    "description": "Fasting, Detoxing 🧐 \uD83D\uDE80",
-    "image": "https://media.istockphoto.com/id/1385373419/vector/intermittent-fasting-concept-man-run-in-clock-waiting-for-time-to-eat-healthy-food-boy.jpg?s=612x612&w=is&k=20&c=ekIJxu5zjbB4w3Z1ipNTFiiHh8IeV8CPnomM1GM3_e0=",
-    "bot": "9",
-    "route": "/mr",
-    "questions": [
-      "Are detox foot pads a scam?",
-      "Can juice fasts detoxify the body?"
-    ],
-    "premium": false
-  },
-  {
     "model": "def-m8",
     "name": "Meow 8B",
-    "description": " \uD83D\uDC08 Playful cat bot 🧐 \uD83D\uDE80",
+    "description": " \uD83D\uDC08 Playful cat bot \uD83E\uDD38 🧐 \uD83D\uDE80",
     "image": "/anim.1731688637.png",
     "bot": "14",
     "route": "/m8",
