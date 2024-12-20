@@ -2,7 +2,8 @@ import localFont from "next/font/local";
 import "../globals.css";
 import { Roboto } from "next/font/google";
 import { Toaster } from "react-hot-toast";
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/react";
+import ThemeWrapper from "../components/ThemeWrapper";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -23,19 +24,22 @@ const geistMono = localFont({
 
 export const metadata = {
   title: "Pick a Brain",
-  description: "Making more helpful, human oriented, high privacy AI as part of symbiotic intelligence vision that will align AI with humans in a better way.",
+  description:
+    "Making more helpful, human oriented, high privacy AI as part of symbiotic intelligence vision that will align AI with humans in a better way.",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${roboto.variable} ${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-gray-900`}
-      >
-        {children}
-        <Toaster />
-        <Analytics />
-      </body>
+      <ThemeWrapper>
+        <body
+          className={`${roboto.variable} ${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-gray-900`}
+        >
+          {children}
+          <Toaster />
+          <Analytics />
+        </body>
+      </ThemeWrapper>
     </html>
   );
 }

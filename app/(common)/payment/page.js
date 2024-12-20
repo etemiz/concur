@@ -1,7 +1,8 @@
+"use client";
 import React from "react";
 import Link from "next/link";
 import GoldenText from "../../components/GoldenText";
-
+import ToggleThemeButton from "@/app/components/ToggleThemeButton";
 const Payment = () => {
   return (
     <div className="w-full px-2 font-roboto">
@@ -32,12 +33,16 @@ const Payment = () => {
         <h1 className="font-roboto py-7 text-3xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-5xl font-bold text-center text-gray-800 dark:text-gray-300">
           Access Types
         </h1>
-        <div className="h-[25px] w-[25px]"></div>
+        <div className="h-[25px] w-[25px]">
+          <ToggleThemeButton />
+        </div>
       </div>
       <div className="flex justify-center">
-        <div className="bg-white/70 dark:bg-black/20 rounded-xl border dark:border-gray-600 p-2 w-full m-1 max-w-xl">
+        <div className="bg-white/70 dark:bg-black/20 rounded-xl border border-gray-300 dark:border-gray-600 p-2 w-full m-1 max-w-xl text-gray-800 dark:text-white">
           <div className="p-1 text-xl text-center">Free</div>
-          <div className="p-1 font-roboto font-light">- Not sophisticated AI</div>
+          <div className="p-1 font-roboto font-light">
+            - Not sophisticated AI
+          </div>
           <div className="p-1 font-roboto font-light">
             - Questions may wait in queue
           </div>
@@ -48,7 +53,7 @@ const Payment = () => {
             - Not optimally curated
           </div>
         </div>
-        <div className="bg-white/70 dark:bg-black/20 rounded-xl border dark:border-gray-600 p-2 w-full m-1 max-w-xl">
+        <div className="bg-white/70 dark:bg-black/20 rounded-xl border border-gray-300 dark:border-gray-600 p-2 w-full m-1 max-w-xl">
           <div className="w-full flex items-center justify-center mt-1">
             <img
               src={"/goldenBrain.png"}

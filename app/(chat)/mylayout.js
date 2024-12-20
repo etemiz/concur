@@ -43,6 +43,7 @@ import {
   getAiCanHalucinateMessageFromLocalStorage,
   saveAiCanHalucinateMessageToLocalStorage,
 } from "../helpers/localStorageHelper";
+import ToggleThemeButton from "../components/ToggleThemeButton";
 
 let pk_other =
   "npub1chadadwep45t4l7xx9z45p72xsxv7833zyy4tctdgh44lpc50nvsrjex2m";
@@ -532,7 +533,7 @@ export default function MyLayout() {
                 <span>
                   <BrainSvg />
                 </span>
-                <span className="ml-2">{"Pick a Brain"}</span>
+                <span className="ml-2 text-black dark:text-white">{"Pick a Brain"}</span>
               </div>
             </div>
           </div>
@@ -555,6 +556,7 @@ export default function MyLayout() {
           >
             <AboutIcon />
           </Link>
+          <ToggleThemeButton />
           <div
             onClick={handleNewChatIconClick}
             className="p-2 my-1 mr-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-pointer"

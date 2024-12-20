@@ -1,13 +1,14 @@
 import localFont from "next/font/local";
 import "../globals.css";
-import { Roboto } from 'next/font/google';
+import { Roboto } from "next/font/google";
 import MyLayout from "./mylayout";
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/react";
+import ThemeWrapper from "../components/ThemeWrapper";
 
 const roboto = Roboto({
-  subsets: ['latin'],
-  variable: '--font-roboto',
-  weight: ['100', '300', '400', '500', '700', '900'],
+  subsets: ["latin"],
+  variable: "--font-roboto",
+  weight: ["100", "300", "400", "500", "700", "900"],
 });
 
 const geistSans = localFont({
@@ -23,21 +24,22 @@ const geistMono = localFont({
 
 export const metadata = {
   title: "Pick a Brain",
-  description: "Making more helpful, human oriented, high privacy AI as part of symbiotic intelligence vision that will align AI with humans in a better way.",
+  description:
+    "Making more helpful, human oriented, high privacy AI as part of symbiotic intelligence vision that will align AI with humans in a better way.",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        suppressHydrationWarning={true}
-        className={`${roboto.variable} ${geistSans.variable} ${geistMono.variable} antialiased bg-[#F4F4F5] dark:bg-[#18181B] fixed top-0 right-0 bottom-0 left-0`}
-      >
-        <MyLayout>
-          {children}
-        </MyLayout>
-        <Analytics />
-      </body>
+      <ThemeWrapper>
+        <body
+          suppressHydrationWarning={true}
+          className={`${roboto.variable} ${geistSans.variable} ${geistMono.variable} antialiased bg-[#F4F4F5] dark:bg-[#18181B] fixed top-0 right-0 bottom-0 left-0`}
+        >
+          <MyLayout>{children}</MyLayout>
+          <Analytics />
+        </body>
+      </ThemeWrapper>
     </html>
   );
 }

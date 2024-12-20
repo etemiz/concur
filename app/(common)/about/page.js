@@ -13,6 +13,7 @@ import { hexToBytes } from "@noble/hashes/utils";
 import { finalizeEvent } from "nostr-tools/pure";
 import GoldenText from "../../components/GoldenText";
 import toast from "react-hot-toast";
+import ToggleThemeButton from "@/app/components/ToggleThemeButton";
 
 let pk_other =
   "npub1nlk894teh248w2heuu0x8z6jjg2hyxkwdc8cxgrjtm9lnamlskcsghjm9c";
@@ -108,32 +109,46 @@ const About = () => {
         <h1 className="font-roboto py-7 text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-7xl font-bold text-center text-gray-800 dark:text-gray-300">
           About
         </h1>
-        <div className="h-[25px] w-[25px]"></div>
+        <div className="h-[25px] w-[25px]">
+          <ToggleThemeButton />
+        </div>
       </div>
-      <div className="flex justify-center flex-row-reverse items-center">
-        <p className="text-xl font-light font-roboto p-4 text-center bg-white/70 dark:bg-black/20 rounded-xl border dark:border-gray-600 max-w-5xl">
-        Welcome to PickaBrain.ai, a haven for curious minds! 🌟 This platform hosts a diverse array of AI models, each with its unique perspective and expertise.
-        Our mission is to curate a collective of wisdom and expertise that resonates with humanity&apos;s values.
-        <br/>
-        <br/>
-        We&apos;re committed to fostering a symbiotic relationship between humans and machines, one that harnesses the strengths of both to create innovative solutions.
-        <br/>
-        <br/>
-        While our models may sometimes diverge from mainstream opinions, it&apos;s precisely this diversity of thought that can lead to breakthroughs
-        and more elegant solutions. Each model brings its own distinct voice and approach to the table.
-        <br/>
-        <br/>
-        Some of our models are designed for entertainment and creative exploration, while others are rooted in real-world human wisdom.
-        We like to call these &apos;human role models&apos;, who embody the best of our collective knowledge and experience.
-        <br/>
-        <br/>
-        For a deeper dive into our vision and philosophy, please visit our <a href="http://etemiz.substack.com"><u>Symbiotic Intelligence Blog</u></a>, where we explore the
-        intersection of humans and machines in pursuit of a brighter, more harmonious future.
+      <div className="flex justify-center flex-row-reverse items-center text-gray-800 dark:text-white">
+        <p className="text-xl font-light font-roboto p-4 text-center bg-white/70 dark:bg-black/20 rounded-xl border-gray-300 border dark:border-gray-600 max-w-5xl">
+          Welcome to PickaBrain.ai, a haven for curious minds! 🌟 This platform
+          hosts a diverse array of AI models, each with its unique perspective
+          and expertise. Our mission is to curate a collective of wisdom and
+          expertise that resonates with humanity&apos;s values.
+          <br />
+          <br />
+          We&apos;re committed to fostering a symbiotic relationship between
+          humans and machines, one that harnesses the strengths of both to
+          create innovative solutions.
+          <br />
+          <br />
+          While our models may sometimes diverge from mainstream opinions,
+          it&apos;s precisely this diversity of thought that can lead to
+          breakthroughs and more elegant solutions. Each model brings its own
+          distinct voice and approach to the table.
+          <br />
+          <br />
+          Some of our models are designed for entertainment and creative
+          exploration, while others are rooted in real-world human wisdom. We
+          like to call these &apos;human role models&apos;, who embody the best
+          of our collective knowledge and experience.
+          <br />
+          <br />
+          For a deeper dive into our vision and philosophy, please visit our{" "}
+          <a href="http://etemiz.substack.com">
+            <u>Symbiotic Intelligence Blog</u>
+          </a>
+          , where we explore the intersection of humans and machines in pursuit
+          of a brighter, more harmonious future.
         </p>
       </div>
-      <div className="w-full mt-10 mb-10">
+      <div className="w-full mt-10 mb-10 text-gray-800 dark:text-white">
         <div className="mx-auto max-w-5xl">
-          <div className="font-roboto font-light p-4 flex flex-col justify-center items-center p-4 text-center bg-white/70 dark:bg-black/20 rounded-xl border w-full dark:border-gray-600">
+          <div className="font-roboto font-light p-4 flex flex-col justify-center items-center p-4 text-center bg-white/70 dark:bg-black/20 rounded-xl border-gray-300 border w-full dark:border-gray-600">
             <p className="font-light font-roboto text-xl py-4 text-center max-w-5xl my-3 mb-9">
               <span className="font-extrabold"></span>We love feedback. Please
               send them using the form below.
@@ -160,7 +175,7 @@ const About = () => {
                 Email (optional)
               </p>
               <input
-                className="w-full rounded border p-2 bg-white dark:bg-black text-black dark:text-white dark:border-gray-600"
+                className="w-full rounded border p-2 bg-white dark:bg-black border-gray-300 text-black dark:text-white dark:border-gray-600"
                 type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -172,7 +187,7 @@ const About = () => {
               <textarea
                 value={message}
                 type="text"
-                className="w-full rounded border p-2 bg-white dark:bg-black text-black dark:text-white dark:border-gray-600"
+                className="w-full rounded border p-2 bg-white dark:bg-black text-black border-gray-300 dark:text-white dark:border-gray-600"
                 onChange={(e) => setMessage(e.target.value)}
               />
 
@@ -182,18 +197,18 @@ const About = () => {
               >
                 SEND
               </button>
-<p>
-</p>
+              <p></p>
               <p>
                 Email:
                 <a className="underline" href="mailto:et@concur.guru">
                   et@concur.guru
                 </a>
-
-
               </p>
               <p>
-              Twitter: <a className="underline"  href="http://x.com/etemiz/">x.com/etemiz</a>
+                Twitter:{" "}
+                <a className="underline" href="http://x.com/etemiz/">
+                  x.com/etemiz
+                </a>
               </p>
             </div>
           </div>
