@@ -3,7 +3,19 @@ import { createContext, useState, useEffect } from "react";
 const ThemeContext = createContext(null);
 
 const ThemeContextProvider = ({ children }) => {
-  const initialTheme = () => {
+  const [theme, setTheme] = useState("dark");
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      document.documentElement.classList.add("dark");
+      setTheme("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      setTheme("light");
+    }
+  }, []);
+
+  useEffect(() => {
     if (!localStorage.getItem("theme")) {
       const prefersDark = window.matchMedia(
         "(prefers-color-scheme: dark)"
@@ -15,18 +27,6 @@ const ThemeContextProvider = ({ children }) => {
         document.documentElement.classList.remove("dark");
         localStorage.setItem("theme", "light");
       }
-    }
-  };
-
-  const [theme, setTheme] = useState(initialTheme());
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark");
-      setTheme("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      setTheme("light");
     }
   }, []);
 
@@ -54,4 +54,7 @@ const ThemeContextProvider = ({ children }) => {
   );
 };
 
-export { ThemeContext, ThemeContextProvider };
+export {
+  ThemeContext,
+  ThemeContextProvider,
+};
