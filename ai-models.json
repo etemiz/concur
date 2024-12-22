@@ -29,19 +29,6 @@
     "premium": false
   },
   {
-    "model": "def-os",
-    "name": "O.S.",
-    "description": "Generalist, Libertarian \uD83E\uDDE0 🧐",
-    "image": "/BotPic.png",
-    "bot": "10",
-    "route": "/os",
-    "questions": [
-      "Can prolonged fasting lead to permanent loss of muscle mass?",
-      "Is there a link between heavy metals in the environment and health problems?"
-    ],
-    "premium": false
-  },
-  {
     "model": "def-mo",
     "name": "Molly",
     "description": "Fasting, Detoxing, Quick answers \uD83D\uDE80",
@@ -84,19 +71,6 @@
     "premium": false
   },
   {
-    "model": "def-kc",
-    "name": "K.C.",
-    "description": "Carnivore diet, Author \uD83E\uDDD0 \uD83E\uDDB8",
-    "image": "https://thumbs.dreamstime.com/z/healthy-organic-diet-nutrition-illustration-concept-doctor-depicting-good-health-depends-lifestyle-305157235.jpg?w=576",
-    "bot": "2",
-    "route": "/kc",
-    "questions": [
-      "Is there a connection between red meat and heart disease?",
-      "Is the study of phytochemicals a promising area of research?"
-    ],
-    "premium": true
-  },
-  {
     "model": "def-jn",
     "name": "J.N.",
     "description": "Alternative medicine, Nutrition \uD83E\uDDE0",
@@ -106,45 +80,6 @@
     "questions": [
       "Can mindfulness meditation improve chronic pain?",
       "Is a flexitarian diet the most sustainable option?"
-    ],
-    "premium": false
-  },
-  {
-    "model": "def-dc",
-    "name": "D.C.",
-    "description": "Vaccine Researcher \uD83E\uDDD0 \uD83E\uDDB8",
-    "image": "/anim.1731538412.png",
-    "bot": "4",
-    "route": "/dc",
-    "questions": [
-      "Are mandatory vaccines a violation of personal freedom?",
-      "Is the use of antibiotics in livestock production necessary and safe, or is it contributing to the rise of antibiotic-resistant bacteria?"
-    ],
-    "premium": true
-  },
-  {
-    "model": "def-ec",
-    "name": "E.C.",
-    "description": "Keto, Intermittent fasting \uD83E\uDD38",
-    "image": "https://cdn.vectorstock.com/i/1000x1000/43/39/vegetable-healthy-diet-vector-22714339.webp",
-    "bot": "5",
-    "route": "/ec",
-    "questions": [
-      "Is intermittent fasting safe?",
-      "Are low-fat diets really healthier than high-fat diets, or has this belief been based on flawed science?"
-    ],
-    "premium": true
-  },
-  {
-    "model": "def-ce",
-    "name": "C.E.",
-    "description": "Healthy living, Truth seeker \uD83E\uDDE0 🧐",
-    "image": "https://img.freepik.com/premium-photo/sherlock-holmes-vector-illustration_996136-3008.jpg",
-    "bot": "6",
-    "route": "/ce",
-    "questions": [
-      "Is permaculture a more cost-effective way to produce food?",
-      "Does the consumption of alkaline water improve health?"
     ],
     "premium": false
   },
@@ -162,5 +97,31 @@
       "How do I select other characters?"
     ],
     "premium": false
+  },
+  {
+    "model": "def-kc",
+    "name": "K.C.",
+    "description": "Carnivore diet, Author \uD83E\uDDD0 \uD83E\uDDB8",
+    "image": "https://thumbs.dreamstime.com/z/healthy-organic-diet-nutrition-illustration-concept-doctor-depicting-good-health-depends-lifestyle-305157235.jpg?w=576",
+    "bot": "2",
+    "route": "/kc",
+    "questions": [
+      "Is there a connection between red meat and heart disease?",
+      "Is the study of phytochemicals a promising area of research?"
+    ],
+    "premium": true
+  },
+  {
+    "model": "def-dc",
+    "name": "D.C.",
+    "description": "Researcher, Journalist \uD83E\uDDD0 \uD83E\uDDB8",
+    "image": "/anim.1731538412.png",
+    "bot": "4",
+    "route": "/dc",
+    "questions": [
+      "Are mandatory vaccines a violation of personal freedom?",
+      "Is the use of antibiotics in livestock production necessary and safe, or is it contributing to the rise of antibiotic-resistant bacteria?"
+    ],
+    "premium": true
   }
 ]
