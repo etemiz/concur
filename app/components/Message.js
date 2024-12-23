@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import aiModelsData from "../../ai-models.json";
@@ -7,6 +8,7 @@ import PencilSvg from "../svgs/PencilSvg";
 import RoundArrowsSvg from "../svgs/RoundArrowsSvg";
 import Markdown from "react-markdown";
 import BrainSvg from "../svgs/BrainSvg";
+import { speech } from "../helpers/commonHelper";
 
 const Messages = ({
   messageHistory,
@@ -21,6 +23,7 @@ const Messages = ({
   setNumberOfHeaderBrainIcons,
   numberOfHeaderBrainIcons,
   selectedAIModel,
+  botsMessagesShouldBeReadAloud,
 }) => {
   let isMessageFromBot = false;
   let alreadyGaveWarning = false;
@@ -71,6 +74,7 @@ const Messages = ({
               }
               setFeedbackForMessage={setFeedbackForMessage}
               retryAMessage={retryAMessage}
+              botsMessagesShouldBeReadAloud={botsMessagesShouldBeReadAloud}
             />
           );
         }
@@ -178,7 +182,15 @@ const TheirMessage = ({
   setInputValueForFeedbackIfDislikedMessageIsEdited,
   setFeedbackForMessage,
   retryAMessage,
+  botsMessagesShouldBeReadAloud,
 }) => {
+
+  useEffect(() => {
+    if (botsMessagesShouldBeReadAloud) {
+      speech(message?.text);
+    }
+  }, []);
+
   return (
     <div className="flex my-2">
       <div className="w-[20px] h-[20px] min-w-[20px]">
