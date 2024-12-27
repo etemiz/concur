@@ -289,7 +289,7 @@ async function makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputF
       isAThinkingMessageFromABot: false,
       isReferencingTheMessage: "",
     });
-  
+
     setMessageHistory([...res.array]);
 
     uniqueEvents.add(signedEvent.id);
@@ -354,7 +354,7 @@ const makeANormalMessageAndAddToMessageHistory = async (
       isAThinkingMessageFromABot: false,
       isReferencingTheMessage: "",
     });
-  
+
     setMessageHistory([...res.array]);
 
     uniqueEvents.add(signedEvent.id);
@@ -362,8 +362,7 @@ const makeANormalMessageAndAddToMessageHistory = async (
     setMessage("");
 
     return signedEvent;
-  } catch (error) {
-  }
+  } catch (error) {}
 };
 
 const publishANormalMessage = async (
@@ -385,10 +384,10 @@ const publishANormalMessage = async (
   signedEvent
 ) => {
   try {
-    if (connectionGotCutOff) recieveAndSetMessageHistory(signedEvent.created_at_time);
+    if (connectionGotCutOff)
+      recieveAndSetMessageHistory(signedEvent.created_at_time);
 
     await Promise.any(pool.publish(listOfRelays, signedEvent));
-
   } catch (error) {
     setConnectionGotCutOff(true);
 
@@ -403,8 +402,7 @@ const publishANormalMessage = async (
     alert(`Multiple errors occurred:\n\n${errorMessages}`);
     console.error(error);
   }
-}
-
+};
 
 const addTag = (event, tagKey, tagValue) => {
   return {
@@ -559,6 +557,19 @@ const isAThinkingMessageFromABot = (event, publicKey, pk_other) => {
   }
 };
 
+function isAFollowUpQuestionFromABot(message) {
+  if (!message || typeof message !== "object") return false;
+
+  if (!Array.isArray(message.tags)) return false;
+
+  const hasFollowUpTag = message.tags.some(
+    (tag) =>
+      Array.isArray(tag) && tag[0] === "t" && tag[1] === "follow-up-questions"
+  );
+
+  return hasFollowUpTag;
+}
+
 export {
   encrypt,
   decrypt,
@@ -578,4 +589,5 @@ export {
   generateNewClientKeysAndSaveThem,
   makeANormalMessageAndAddToMessageHistory,
   publishANormalMessage,
+  isAFollowUpQuestionFromABot,
 };

@@ -9,6 +9,8 @@ import RoundArrowsSvg from "../svgs/RoundArrowsSvg";
 import Markdown from "react-markdown";
 import BrainSvg from "../svgs/BrainSvg";
 import { speech } from "../helpers/commonHelper";
+import { isAFollowUpQuestionFromABot } from "../helpers/nip4Helpers";
+import CollapsibleList from "./CollapsibleList";
 
 const Messages = ({
   messageHistory,
@@ -25,9 +27,6 @@ const Messages = ({
   selectedAIModel,
   botsMessagesShouldBeReadAloud,
 }) => {
-  let isMessageFromBot = false;
-  let alreadyGaveWarning = false;
-
   return (
     <div className="overflow-y-auto flex-grow justify-end text-black dark:text-gray-100 p-4 max-w-3xl mx-auto w-full">
       {messageHistory?.map((message, index) => {
@@ -58,25 +57,32 @@ const Messages = ({
             />
           );
         } else {
-          isMessageFromBot = true;
-
-          returnValue = (
-            <TheirMessage
-              key={message.id}
-              message={message}
-              setAddReactionDialogOpenForMessage={
-                setAddReactionDialogOpenForMessage
-              }
-              setIsAddReactionDialogOpen={setIsAddReactionDialogOpen}
-              reaction={reactionsOfMessages[message?.id]}
-              setInputValueForFeedbackIfDislikedMessageIsEdited={
-                setInputValueForFeedbackIfDislikedMessageIsEdited
-              }
-              setFeedbackForMessage={setFeedbackForMessage}
-              retryAMessage={retryAMessage}
-              botsMessagesShouldBeReadAloud={botsMessagesShouldBeReadAloud}
-            />
-          );
+          if (isAFollowUpQuestionFromABot(message)) {
+            returnValue = (
+              <FollowUpQuestion
+                message={message}
+                sendDefaultMessageOfAiModel={sendDefaultMessageOfAiModel}
+              />
+            );
+          } else {
+            returnValue = (
+              <TheirMessage
+                key={message.id}
+                message={message}
+                setAddReactionDialogOpenForMessage={
+                  setAddReactionDialogOpenForMessage
+                }
+                setIsAddReactionDialogOpen={setIsAddReactionDialogOpen}
+                reaction={reactionsOfMessages[message?.id]}
+                setInputValueForFeedbackIfDislikedMessageIsEdited={
+                  setInputValueForFeedbackIfDislikedMessageIsEdited
+                }
+                setFeedbackForMessage={setFeedbackForMessage}
+                retryAMessage={retryAMessage}
+                botsMessagesShouldBeReadAloud={botsMessagesShouldBeReadAloud}
+              />
+            );
+          }
         }
 
         return returnValue;
@@ -184,7 +190,6 @@ const TheirMessage = ({
   retryAMessage,
   botsMessagesShouldBeReadAloud,
 }) => {
-
   useEffect(() => {
     if (botsMessagesShouldBeReadAloud) {
       speech(message?.text);
@@ -293,6 +298,30 @@ const StatusMessage = ({ message, sendDefaultMessageOfAiModel }) => {
             <div className="ml-2 py-1">{question}</div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+};
+
+const FollowUpQuestion = ({ message, sendDefaultMessageOfAiModel }) => {
+  const questions = useMemo(() => {
+    console.log(message);
+    return message?.text?.split("~|~") || [];
+  }, [message?.text]);
+
+  return (
+    <div className="flex my-2">
+      <div className="w-[20px] h-[20px] min-w-[20px]"></div>
+      <div className="flex flex-col justify-between">
+        <div className="font-light flex text-sm px-2 text-gray-600 dark:text-gray-300 justify-between items-center">
+          <div></div>
+        </div>
+        <div className="flex flex-col items-start relative">
+          <CollapsibleList
+            items={questions}
+            sendDefaultMessageOfAiModel={sendDefaultMessageOfAiModel}
+          />
+        </div>
       </div>
     </div>
   );
