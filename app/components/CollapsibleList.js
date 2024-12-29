@@ -25,9 +25,11 @@ const CollapsibleList = ({ items, sendDefaultMessageOfAiModel }) => {
               {items[0]}
             </Markdown>
           </li>
-          <div onClick={handleToggle} className="ml-2">
-            {isExpanded ? <MinusSvg /> : <PlusSvg />}
-          </div>
+          {items.length > 1 && (
+            <div onClick={handleToggle} className="ml-2">
+              {isExpanded ? <MinusSvg /> : <PlusSvg />}
+            </div>
+          )}
         </div>
       </ul>
 
@@ -39,7 +41,7 @@ const CollapsibleList = ({ items, sendDefaultMessageOfAiModel }) => {
         {items.slice(1).map((item, index) => (
           <li
             key={index}
-            className={` max-w-xl border rounded-2xl dark:border-slate-500 hover:dark:bg-slate-500 hover:bg-slate-100 cursor-pointer p-2 flex justify-between items-center mb-1 transform ${
+            className={` max-w-xl border rounded-2xl dark:border-slate-500 hover:dark:bg-slate-500 hover:bg-slate-100 cursor-pointer p-2 flex justify-between items-center mb-1 transform w-fit ${
               isExpanded
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 -translate-y-2"
