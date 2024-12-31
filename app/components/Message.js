@@ -305,7 +305,6 @@ const StatusMessage = ({ message, sendDefaultMessageOfAiModel }) => {
 
 const FollowUpQuestion = ({ message, sendDefaultMessageOfAiModel }) => {
   const questions = useMemo(() => {
-    console.log(message);
     return message?.text?.split("~|~") || [];
   }, [message?.text]);
 

@@ -21,6 +21,7 @@ import {
   generateNewClientKeysAndSaveThem,
   makeANormalMessageAndAddToMessageHistory,
   publishANormalMessage,
+  shareAMessageToRelays
 } from "../helpers/nip4Helpers";
 import aiModelsData from "../../ai-models.json";
 import BrainSvg from "../svgs/BrainSvg";
@@ -45,6 +46,7 @@ import {
 } from "../helpers/localStorageHelper";
 import ToggleThemeButton from "../components/ToggleThemeButton";
 import SpeakerIcon from "../svgs/SpeakerIcon";
+import ShareAMessageDialog from "../components/ShareAMessageDialog";
 
 let pk_other =
   "npub1chadadwep45t4l7xx9z45p72xsxv7833zyy4tctdgh44lpc50nvsrjex2m";
@@ -99,6 +101,9 @@ export default function MyLayout() {
   const [reactionsOfMessages, setReactionsOfMessages] = useState({});
   const [botsMessagesShouldBeReadAloud, setBotsMessagesShouldBeReadAloud] =
     useState(false);
+  const [isShareAMessageDialogOpen, setIsShareAMessageDialogOpen] =
+    useState(false);
+  const [textToBeShared, setTextToBeShared] = useState(null);
 
   const listOfRelays = settings.listOfRelays;
 
@@ -318,23 +323,6 @@ export default function MyLayout() {
   };
 
   const sendDefaultMessageOfAiModel = async (message) => {
-    // makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField(
-    //   publicKeyMyself,
-    //   secretKeyMyself,
-    //   pk_other,
-    //   message,
-    //   connectionGotCutOff,
-    //   recieveAndSetMessageHistory,
-    //   pool,
-    //   listOfRelays,
-    //   setMessage,
-    //   setConnectionGotCutOff,
-    //   selectedAIModel,
-    //   premiumUserCookieValue,
-    //   uniqueEvents,
-    //   setMessageHistory,
-    //   sorted
-    // );
 
     const messageToPublish = await makeANormalMessageAndAddToMessageHistory(
       publicKeyMyself,
@@ -421,6 +409,24 @@ export default function MyLayout() {
       setConnectionGotCutOff,
       premiumUserCookieValue
     );
+  };
+
+  const handleShareAMessageReactionClicked = async (selectedMessage) => {
+    setIsShareAMessageDialogOpen(true);
+  };
+
+  const handleShareAMessage = async () => {
+    setIsShareAMessageDialogOpen(false);
+
+    shareAMessageToRelays(
+      textToBeShared,
+      secretKeyMyself,
+      pool,
+      listOfRelays,
+      publicKeyMyself,
+      pk_other,
+      addReactionDialogOpenForMessage
+    )
   };
 
   const setInputValueForFeedbackIfDislikedMessageIsEdited = (message) => {
@@ -646,6 +652,17 @@ export default function MyLayout() {
         isAddReactionDialogOpen={isAddReactionDialogOpen}
         setIsAddReactionDialogOpen={setIsAddReactionDialogOpen}
         handleReactionOnMessage={handleReactionOnMessage}
+        handleShareAMessageReactionClicked={handleShareAMessageReactionClicked}
+      />
+
+      <ShareAMessageDialog
+        isShareAMessageDialogOpen={isShareAMessageDialogOpen}
+        setIsShareAMessageDialogOpen={setIsShareAMessageDialogOpen}
+        handleShareAMessage={handleShareAMessage}
+        addReactionDialogOpenForMessage={addReactionDialogOpenForMessage}
+        sorted={sorted}
+        textToBeShared={textToBeShared}
+        setTextToBeShared={setTextToBeShared}
       />
     </div>
   );

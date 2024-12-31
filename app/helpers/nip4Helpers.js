@@ -155,6 +155,8 @@ async function decryptAndAddMyMessageToMessageHistory(
 }
 
 const handleReactionForAMessageRecieved = (event, setReactionsOfMessages) => {
+  if (isAShareReaction(event)) return;
+
   const messageId = event.tags[1][1];
   const newEvent = event;
   const newCreatedAt = newEvent.created_at;
@@ -171,6 +173,14 @@ const handleReactionForAMessageRecieved = (event, setReactionsOfMessages) => {
 
     return prevReactions;
   });
+};
+
+const isAShareReaction = (event) => {
+  if (event.content === "shared") {
+    return true;
+  } else {
+    return false;
+  }
 };
 
 const isMessageAFeedbackOfBotsResponse = (message) => {
@@ -570,6 +580,73 @@ function isAFollowUpQuestionFromABot(message) {
   return hasFollowUpTag;
 }
 
+function extractEValue(data) {
+  if (!data || !Array.isArray(data.tags)) {
+    return "";
+  }
+
+  for (const tag of data.tags) {
+    if (tag[0] === "e" && tag[1]) {
+      return tag[1];
+    }
+  }
+
+  return "";
+}
+
+const shareAMessageToRelays = async (
+  contentToShare,
+  secretKeyMyself,
+  pool,
+  listOfRelays,
+  publicKeyMyself,
+  pk_other,
+  addReactionDialogOpenForMessage
+) => {
+  try {
+    let created_at_time = Math.floor(Date.now() / 1000);
+    let eventTemplate = {
+      kind: 1,
+      created_at: created_at_time,
+      tags: [],
+      content: contentToShare,
+    };
+
+    let event = finalizeEvent(eventTemplate, hexToBytes(secretKeyMyself));
+
+    await Promise.any(pool.publish(listOfRelays, event));
+
+    created_at_time = Math.floor(Date.now() / 1000);
+
+    eventTemplate = {
+      kind: 7,
+      created_at: created_at_time,
+      pubkey: publicKeyMyself,
+      tags: [],
+      content: "shared",
+    };
+
+    eventTemplate = addTag(eventTemplate, "p", pk_other);
+    eventTemplate = addTag(
+      eventTemplate,
+      "e",
+      addReactionDialogOpenForMessage?.id
+    );
+
+    const signedEvent = finalizeEvent(
+      eventTemplate,
+      hexToBytes(secretKeyMyself)
+    );
+
+    const res = await Promise.any(pool.publish(listOfRelays, signedEvent));
+  } catch (error) {
+    console.error(
+      "An error occurred while sharing the message to relays:",
+      error
+    );
+  }
+};
+
 export {
   encrypt,
   decrypt,
@@ -590,4 +667,6 @@ export {
   makeANormalMessageAndAddToMessageHistory,
   publishANormalMessage,
   isAFollowUpQuestionFromABot,
+  extractEValue,
+  shareAMessageToRelays,
 };
