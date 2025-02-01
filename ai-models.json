@@ -2,7 +2,7 @@
   {
     "model": "def",
     "name": "Pamela",
-    "description": "Helpful assistant, Fast answers \uD83D\uDE80",
+    "description": "Helpful assistant",
     "image": "/anim.1731087657.png",
     "bot": "1",
     "route": "/pa",
@@ -16,7 +16,7 @@
   {
     "model": "def-bc",
     "name": "Based Chad",
-    "description": " Truth warrior, Mansplaining \uD83E\uDD38 🧐 \uD83E\uDDE0",
+    "description": " Truth warrior, Mansplaining \uD83E\uDD38",
     "image": "/based-chad.png",
     "bot": "15",
     "route": "/bc",
@@ -29,23 +29,9 @@
     "premium": false
   },
   {
-    "model": "def-mo",
-    "name": "Molly",
-    "description": "Fasting, Detoxing, Quick answers \uD83D\uDE80",
-    "image": "/anim.1731088273.png",
-    "bot": "11",
-    "route": "/mo",
-    "questions": [
-      "Is fasting beneficial or dangerous?",
-      "Can juice fasts detoxify the body?",
-      "What is intermittent fasting?"
-    ],
-    "premium": false
-  },
-  {
     "model": "def-ab",
     "name": "Abraham",
-    "description": "Herbalism, Supplements \uD83E\uDDE0 🧐 \uD83E\uDDB8",
+    "description": "Healthy living \uD83E\uDDB8",
     "image": "/anim.1731088428.png",
     "bot": "12",
     "route": "/ab",
@@ -59,7 +45,7 @@
   {
     "model": "def-ko",
     "name": "Kooby",
-    "description": "Ancient wisdom, Mystic \uD83E\uDDE0 🧐 \uD83E\uDDB8",
+    "description": "Ancient wisdom, Mystic \uD83E\uDDB8",
     "image": "/anim.1731088564.png",
     "bot": "13",
     "route": "/ko",
@@ -71,22 +57,9 @@
     "premium": false
   },
   {
-    "model": "def-jn",
-    "name": "J.N.",
-    "description": "Alternative medicine, Nutrition \uD83E\uDDE0",
-    "image": "/anim.1731688407.png",
-    "bot": "3",
-    "route": "/jn",
-    "questions": [
-      "Can mindfulness meditation improve chronic pain?",
-      "Is a flexitarian diet the most sustainable option?"
-    ],
-    "premium": false
-  },
-  {
     "model": "def-m8",
     "name": "Meow 8B",
-    "description": " \uD83D\uDC08 Playful cat bot \uD83E\uDD38 🧐 \uD83D\uDE80",
+    "description": " \uD83D\uDC08 Playful cat bot \uD83E\uDD38 \uD83D\uDE80",
     "image": "/anim.1731688637.png",
     "bot": "14",
     "route": "/m8",
@@ -101,7 +74,7 @@
   {
     "model": "def-kc",
     "name": "K.C.",
-    "description": "Carnivore diet, Author \uD83E\uDDD0 \uD83E\uDDB8",
+    "description": "Carnivore diet, Author \uD83E\uDDB8",
     "image": "https://thumbs.dreamstime.com/z/healthy-organic-diet-nutrition-illustration-concept-doctor-depicting-good-health-depends-lifestyle-305157235.jpg?w=576",
     "bot": "2",
     "route": "/kc",
@@ -114,7 +87,7 @@
   {
     "model": "def-dc",
     "name": "D.C.",
-    "description": "Researcher, Journalist \uD83E\uDDD0 \uD83E\uDDB8",
+    "description": "Researcher, Journalist \uD83E\uDDB8",
     "image": "/anim.1731538412.png",
     "bot": "4",
     "route": "/dc",
