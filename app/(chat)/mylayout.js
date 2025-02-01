@@ -21,6 +21,7 @@ import {
   generateNewClientKeysAndSaveThem,
   makeANormalMessageAndAddToMessageHistory,
   publishANormalMessage,
+  shareAMessageToRelays
 } from "../helpers/nip4Helpers";
 import aiModelsData from "../../ai-models.json";
 import BrainSvg from "../svgs/BrainSvg";
@@ -44,6 +45,8 @@ import {
   saveAiCanHalucinateMessageToLocalStorage,
 } from "../helpers/localStorageHelper";
 import ToggleThemeButton from "../components/ToggleThemeButton";
+import SpeakerIcon from "../svgs/SpeakerIcon";
+import ShareAMessageDialog from "../components/ShareAMessageDialog";
 
 let pk_other =
   "npub1chadadwep45t4l7xx9z45p72xsxv7833zyy4tctdgh44lpc50nvsrjex2m";
@@ -96,6 +99,11 @@ export default function MyLayout() {
     useState(null);
   const [feedbackForMessage, setFeedbackForMessage] = useState(null);
   const [reactionsOfMessages, setReactionsOfMessages] = useState({});
+  const [botsMessagesShouldBeReadAloud, setBotsMessagesShouldBeReadAloud] =
+    useState(false);
+  const [isShareAMessageDialogOpen, setIsShareAMessageDialogOpen] =
+    useState(false);
+  const [textToBeShared, setTextToBeShared] = useState(null);
 
   const listOfRelays = settings.listOfRelays;
 
@@ -111,7 +119,7 @@ export default function MyLayout() {
 
     recieveAndSetMessageHistory(null, secretKey, publicKey);
 
-    updateLastRunTime()
+    updateLastRunTime();
   }, []);
 
   const recieveAndSetMessageHistory = (
@@ -315,23 +323,6 @@ export default function MyLayout() {
   };
 
   const sendDefaultMessageOfAiModel = async (message) => {
-    // makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputField(
-    //   publicKeyMyself,
-    //   secretKeyMyself,
-    //   pk_other,
-    //   message,
-    //   connectionGotCutOff,
-    //   recieveAndSetMessageHistory,
-    //   pool,
-    //   listOfRelays,
-    //   setMessage,
-    //   setConnectionGotCutOff,
-    //   selectedAIModel,
-    //   premiumUserCookieValue,
-    //   uniqueEvents,
-    //   setMessageHistory,
-    //   sorted
-    // );
 
     const messageToPublish = await makeANormalMessageAndAddToMessageHistory(
       publicKeyMyself,
@@ -370,7 +361,7 @@ export default function MyLayout() {
       setMessageHistory,
       sorted,
       messageToPublish
-    )
+    );
   };
 
   const handleKeyDown = (event) => {
@@ -418,6 +409,24 @@ export default function MyLayout() {
       setConnectionGotCutOff,
       premiumUserCookieValue
     );
+  };
+
+  const handleShareAMessageReactionClicked = async (selectedMessage) => {
+    setIsShareAMessageDialogOpen(true);
+  };
+
+  const handleShareAMessage = async () => {
+    setIsShareAMessageDialogOpen(false);
+
+    shareAMessageToRelays(
+      textToBeShared,
+      secretKeyMyself,
+      pool,
+      listOfRelays,
+      publicKeyMyself,
+      pk_other,
+      addReactionDialogOpenForMessage
+    )
   };
 
   const setInputValueForFeedbackIfDislikedMessageIsEdited = (message) => {
@@ -533,7 +542,9 @@ export default function MyLayout() {
                 <span>
                   <BrainSvg />
                 </span>
-                <span className="ml-2 text-black dark:text-white">{"Pick a Brain"}</span>
+                <span className="ml-2 text-black dark:text-white">
+                  {"Pick a Brain"}
+                </span>
               </div>
             </div>
           </div>
@@ -556,7 +567,17 @@ export default function MyLayout() {
           >
             <AboutIcon />
           </Link>
-          <ToggleThemeButton />
+          <div
+            className={`rounded-full ${
+              botsMessagesShouldBeReadAloud && "bg-gray-200 dark:bg-gray-700"
+            } p-2 cursor-pointer`}
+            onClick={() => setBotsMessagesShouldBeReadAloud((prev) => !prev)}
+          >
+            <SpeakerIcon />
+          </div>
+          <div className="p-2">
+            <ToggleThemeButton />
+          </div>
           <div
             onClick={handleNewChatIconClick}
             className="p-2 my-1 mr-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-pointer"
@@ -585,6 +606,7 @@ export default function MyLayout() {
           numberOfHeaderBrainIcons={numberOfHeaderBrainIcons}
           setNumberOfHeaderBrainIcons={setNumberOfHeaderBrainIcons}
           selectedAIModel={selectedAIModel}
+          botsMessagesShouldBeReadAloud={botsMessagesShouldBeReadAloud}
         />
       }
 
@@ -630,6 +652,17 @@ export default function MyLayout() {
         isAddReactionDialogOpen={isAddReactionDialogOpen}
         setIsAddReactionDialogOpen={setIsAddReactionDialogOpen}
         handleReactionOnMessage={handleReactionOnMessage}
+        handleShareAMessageReactionClicked={handleShareAMessageReactionClicked}
+      />
+
+      <ShareAMessageDialog
+        isShareAMessageDialogOpen={isShareAMessageDialogOpen}
+        setIsShareAMessageDialogOpen={setIsShareAMessageDialogOpen}
+        handleShareAMessage={handleShareAMessage}
+        addReactionDialogOpenForMessage={addReactionDialogOpenForMessage}
+        sorted={sorted}
+        textToBeShared={textToBeShared}
+        setTextToBeShared={setTextToBeShared}
       />
     </div>
   );

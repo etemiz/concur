@@ -12,6 +12,7 @@ export default function AddReactionDialog({
   isAddReactionDialogOpen,
   setIsAddReactionDialogOpen,
   handleReactionOnMessage,
+  handleShareAMessageReactionClicked
 }) {
   return (
     <>
@@ -55,6 +56,19 @@ export default function AddReactionDialog({
                     onClick={() => {
                       setIsAddReactionDialogOpen(false);
                       handleReactionOnMessage("👎");
+                    }}
+                  />
+                </div>
+                <div className="p-2">
+                  <Image
+                    src="/share.png"
+                    width={50}
+                    height={50}
+                    alt="Dislike"
+                    className="hover:scale-110"
+                    onClick={() => {
+                      setIsAddReactionDialogOpen(false);
+                      handleShareAMessageReactionClicked();
                     }}
                   />
                 </div>

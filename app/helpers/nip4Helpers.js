@@ -155,6 +155,8 @@ async function decryptAndAddMyMessageToMessageHistory(
 }
 
 const handleReactionForAMessageRecieved = (event, setReactionsOfMessages) => {
+  if (isAShareReaction(event)) return;
+
   const messageId = event.tags[1][1];
   const newEvent = event;
   const newCreatedAt = newEvent.created_at;
@@ -171,6 +173,14 @@ const handleReactionForAMessageRecieved = (event, setReactionsOfMessages) => {
 
     return prevReactions;
   });
+};
+
+const isAShareReaction = (event) => {
+  if (event.content === "shared") {
+    return true;
+  } else {
+    return false;
+  }
 };
 
 const isMessageAFeedbackOfBotsResponse = (message) => {
@@ -289,7 +299,7 @@ async function makeANormalMessageEventAndPublishToRelayPoolAndClearMessageInputF
       isAThinkingMessageFromABot: false,
       isReferencingTheMessage: "",
     });
-  
+
     setMessageHistory([...res.array]);
 
     uniqueEvents.add(signedEvent.id);
@@ -354,7 +364,7 @@ const makeANormalMessageAndAddToMessageHistory = async (
       isAThinkingMessageFromABot: false,
       isReferencingTheMessage: "",
     });
-  
+
     setMessageHistory([...res.array]);
 
     uniqueEvents.add(signedEvent.id);
@@ -362,8 +372,7 @@ const makeANormalMessageAndAddToMessageHistory = async (
     setMessage("");
 
     return signedEvent;
-  } catch (error) {
-  }
+  } catch (error) {}
 };
 
 const publishANormalMessage = async (
@@ -385,10 +394,10 @@ const publishANormalMessage = async (
   signedEvent
 ) => {
   try {
-    if (connectionGotCutOff) recieveAndSetMessageHistory(signedEvent.created_at_time);
+    if (connectionGotCutOff)
+      recieveAndSetMessageHistory(signedEvent.created_at_time);
 
     await Promise.any(pool.publish(listOfRelays, signedEvent));
-
   } catch (error) {
     setConnectionGotCutOff(true);
 
@@ -403,8 +412,7 @@ const publishANormalMessage = async (
     alert(`Multiple errors occurred:\n\n${errorMessages}`);
     console.error(error);
   }
-}
-
+};
 
 const addTag = (event, tagKey, tagValue) => {
   return {
@@ -559,6 +567,86 @@ const isAThinkingMessageFromABot = (event, publicKey, pk_other) => {
   }
 };
 
+function isAFollowUpQuestionFromABot(message) {
+  if (!message || typeof message !== "object") return false;
+
+  if (!Array.isArray(message.tags)) return false;
+
+  const hasFollowUpTag = message.tags.some(
+    (tag) =>
+      Array.isArray(tag) && tag[0] === "t" && tag[1] === "follow-up-questions"
+  );
+
+  return hasFollowUpTag;
+}
+
+function extractEValue(data) {
+  if (!data || !Array.isArray(data.tags)) {
+    return "";
+  }
+
+  for (const tag of data.tags) {
+    if (tag[0] === "e" && tag[1]) {
+      return tag[1];
+    }
+  }
+
+  return "";
+}
+
+const shareAMessageToRelays = async (
+  contentToShare,
+  secretKeyMyself,
+  pool,
+  listOfRelays,
+  publicKeyMyself,
+  pk_other,
+  addReactionDialogOpenForMessage
+) => {
+  try {
+    let created_at_time = Math.floor(Date.now() / 1000);
+    let eventTemplate = {
+      kind: 1,
+      created_at: created_at_time,
+      tags: [],
+      content: contentToShare,
+    };
+
+    let event = finalizeEvent(eventTemplate, hexToBytes(secretKeyMyself));
+
+    await Promise.any(pool.publish(listOfRelays, event));
+
+    created_at_time = Math.floor(Date.now() / 1000);
+
+    eventTemplate = {
+      kind: 7,
+      created_at: created_at_time,
+      pubkey: publicKeyMyself,
+      tags: [],
+      content: "shared",
+    };
+
+    eventTemplate = addTag(eventTemplate, "p", pk_other);
+    eventTemplate = addTag(
+      eventTemplate,
+      "e",
+      addReactionDialogOpenForMessage?.id
+    );
+
+    const signedEvent = finalizeEvent(
+      eventTemplate,
+      hexToBytes(secretKeyMyself)
+    );
+
+    const res = await Promise.any(pool.publish(listOfRelays, signedEvent));
+  } catch (error) {
+    console.error(
+      "An error occurred while sharing the message to relays:",
+      error
+    );
+  }
+};
+
 export {
   encrypt,
   decrypt,
@@ -578,4 +666,7 @@ export {
   generateNewClientKeysAndSaveThem,
   makeANormalMessageAndAddToMessageHistory,
   publishANormalMessage,
+  isAFollowUpQuestionFromABot,
+  extractEValue,
+  shareAMessageToRelays,
 };
