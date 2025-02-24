@@ -567,14 +567,6 @@ export default function MyLayout() {
           >
             <AboutIcon />
           </Link>
-          <div
-            className={`rounded-full ${
-              botsMessagesShouldBeReadAloud && "bg-gray-200 dark:bg-gray-700"
-            } p-2 cursor-pointer`}
-            onClick={() => setBotsMessagesShouldBeReadAloud((prev) => !prev)}
-          >
-            <SpeakerIcon />
-          </div>
           <div className="p-2">
             <ToggleThemeButton />
           </div>
