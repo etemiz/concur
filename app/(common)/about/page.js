@@ -158,7 +158,7 @@ const About = () => {
             <p className="font-roboto text-start">
               Detailed feedback and bug submitters will get{" "}
               <span className="font-bold">
-                <GoldenText>Golden Brain badge</GoldenText>
+                <GoldenText>Golden Brain Badge</GoldenText>
               </span>{" "}
               that will work for a few months and will be able to access more
               features for free. Be sure to add your email for that.
@@ -200,8 +200,8 @@ const About = () => {
               <p></p>
               <p>
                 Email:
-                <a className="underline" href="mailto:et@concur.guru">
-                  et@concur.guru
+                <a className="underline" href="mailto:et@pickabrain.ai">
+                  et@pickabrain.ai
                 </a>
               </p>
               <p>
