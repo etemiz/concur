@@ -2,7 +2,7 @@
   {
     "model": "def",
     "name": "Pamela",
-    "description": "Helpful assistant",
+    "description": "Helpful assistant [Llama 3]",
     "image": "/anim.1731087657.png",
     "bot": "1",
     "route": "/pa",
@@ -14,9 +14,23 @@
     "premium": false
   },
   {
+    "model": "def-mo",
+    "name": "Molly",
+    "description": "Helpful assistant [Gemma 3]",
+    "image": "/anim.1731087811.png",
+    "bot": "1",
+    "route": "/mo",
+    "questions": [
+      "Is fasting for a long time very dangerous?",
+      "What are some good nutrition advice?",
+      "Is carnivore a dangerous diet?"
+    ],
+    "premium": false
+  },
+  {
     "model": "def-bc",
     "name": "Based Chad",
-    "description": " Truth warrior, Mansplaining \uD83E\uDD38",
+    "description": "Helpful assistant [Llama 3]",
     "image": "/based-chad.png",
     "bot": "15",
     "route": "/bc",
@@ -31,7 +45,7 @@
   {
     "model": "def-ab",
     "name": "Abraham",
-    "description": "Healthy living \uD83E\uDDB8",
+    "description": "Helpful assistant, Thinking [Qwen 3]",
     "image": "/anim.1731088428.png",
     "bot": "12",
     "route": "/ab",
@@ -45,7 +59,7 @@
   {
     "model": "def-ko",
     "name": "Kooby",
-    "description": "Ancient wisdom, Mystic \uD83E\uDDB8",
+    "description": "Helpful assistant [Llama 3]",
     "image": "/anim.1731088564.png",
     "bot": "13",
     "route": "/ko",
@@ -59,15 +73,14 @@
   {
     "model": "def-m8",
     "name": "Meow 8B",
-    "description": " \uD83D\uDC08 Playful cat bot \uD83E\uDD38 \uD83D\uDE80",
+    "description": " \uD83D\uDC08 Playful cat bot \uD83E\uDD38 \uD83D\uDE80 [Gemma 3]",
     "image": "/anim.1731688637.png",
     "bot": "14",
     "route": "/m8",
     "questions": [
       "What's the secret to chasing a laser pointer for hours on end without getting tired?",
       "Does the red dot even exist?",
-      "Can you translate cat language for me? I want to know what my cat says when they're plotting world domination!",
-      "How do I select other characters?"
+      "Can you translate cat language for me? I want to know what my cat says when they're plotting world domination!"
     ],
     "premium": false
   },
