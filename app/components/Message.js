@@ -26,6 +26,7 @@ const Messages = ({
   numberOfHeaderBrainIcons,
   selectedAIModel,
   botsMessagesShouldBeReadAloud,
+  recieveAndSetMessageHistory,
 }) => {
   return (
     <div className="overflow-y-auto flex-grow justify-end text-black dark:text-gray-100 p-4 max-w-3xl mx-auto w-full">
@@ -80,6 +81,7 @@ const Messages = ({
                 setFeedbackForMessage={setFeedbackForMessage}
                 retryAMessage={retryAMessage}
                 botsMessagesShouldBeReadAloud={botsMessagesShouldBeReadAloud}
+                recieveAndSetMessageHistory={recieveAndSetMessageHistory}
               />
             );
           }
@@ -189,12 +191,23 @@ const TheirMessage = ({
   setFeedbackForMessage,
   retryAMessage,
   botsMessagesShouldBeReadAloud,
+  recieveAndSetMessageHistory,
 }) => {
   useEffect(() => {
     if (botsMessagesShouldBeReadAloud) {
       speech(message?.text);
     }
   }, []);
+
+  useEffect(() => {
+    if (message?.text === "🤔") {
+      const intervalId = setInterval(() => {
+        recieveAndSetMessageHistory();
+      }, 5000);
+
+      return () => clearInterval(intervalId);
+    }
+  }, [message]);
 
   return (
     <div className="flex my-2">

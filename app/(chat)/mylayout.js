@@ -21,7 +21,7 @@ import {
   generateNewClientKeysAndSaveThem,
   makeANormalMessageAndAddToMessageHistory,
   publishANormalMessage,
-  shareAMessageToRelays
+  shareAMessageToRelays,
 } from "../helpers/nip4Helpers";
 import aiModelsData from "../../ai-models.json";
 import BrainSvg from "../svgs/BrainSvg";
@@ -599,6 +599,7 @@ export default function MyLayout() {
           setNumberOfHeaderBrainIcons={setNumberOfHeaderBrainIcons}
           selectedAIModel={selectedAIModel}
           botsMessagesShouldBeReadAloud={botsMessagesShouldBeReadAloud}
+          recieveAndSetMessageHistory={recieveAndSetMessageHistory}
         />
       }
 
